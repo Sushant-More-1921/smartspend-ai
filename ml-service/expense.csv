@@ -1,0 +1,57 @@
+amount,description,category
+120,Tea and snacks,Food
+300,Zomato Order,Food
+250,McDonald's Lunch,Food
+200,KFC Chicken,Food
+400,Domino's Pizza,Food
+100,Coffee,Food
+1800,Bakery items,Food
+1000,Swiggy Dinner,Food
+275,Breakfast at café,Food
+360,Lunch buffet,Food
+1200,Uber Ride,Transport
+100,Bus Ticket,Transport
+220,Metro Card,Transport
+150,Auto Fare,Transport
+70,Bike Fuel,Transport
+90,Parking,Transport
+800,Cab from airport,Transport
+950,Train Ticket,Transport
+115,Shared Auto,Transport
+200,Taxi Ride,Transport
+550,Netflix,Entertainment
+800,Movie Tickets,Entertainment
+650,Spotify,Entertainment
+500,Amazon Prime,Entertainment
+300,Game Purchase,Entertainment
+1000,Concert,Entertainment
+150,Arcade,Entertainment
+90,YouTube Premium,Entertainment
+250,Book Fair,Entertainment
+600,Game Top-up,Entertainment
+4000,Electricity Bill,Utilities
+800,Mobile Recharge,Utilities
+600,Wi-Fi Bill,Utilities
+200,Water Bill,Utilities
+900,Gas Bill,Utilities
+180,Garbage Collection,Utilities
+120,Extension Cord,Utilities
+90,Battery Pack,Utilities
+300,Light Bulbs,Utilities
+700,Home Repair,Utilities
+90,Aspirin,Healthcare
+700,Doctor Visit,Healthcare
+300,Pharmacy,Healthcare
+1200,Lab Test,Healthcare
+600,Dental,Healthcare
+400,Eye Drops,Healthcare
+150,First Aid,Healthcare
+80,Medical Kit,Healthcare
+250,Ayurveda,Healthcare
+350,Health Insurance,Healthcare
+1200,Housing,Rent
+800,Insurance,Insurance
+500,Property Tax,Insurance
+600,Home Loan EMI,Insurance
+1000,Car Insurance,Insurance
+200,Travel Insurance,Insurance
