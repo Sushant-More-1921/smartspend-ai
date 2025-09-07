@@ -6,7 +6,7 @@ export async function POST(req) {
     const body = await req.json();
     const { email, total_budget } = body;
 
-    const resp = await fetch("http://127.0.0.1:8000/recommend", {
+    const resp = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/recommend`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, total_budget }),
