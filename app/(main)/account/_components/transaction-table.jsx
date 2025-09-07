@@ -469,7 +469,7 @@ export function TransactionTable({ transactions }) {
             size="icon"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="border-[#8884d8]/30 text-white hover:bg-[#8884d8]/20"
+            className="border-[#8884d8]/30 text-white bg-[#8884d8]/20 hover:bg-purple-400"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -481,7 +481,7 @@ export function TransactionTable({ transactions }) {
             size="icon"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="border-[#8884d8]/30 text-white hover:bg-[#8884d8]/20"
+            className="border-[#8884d8]/30 text-white bg-[#8884d8]/20 hover:bg-purple-400"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
