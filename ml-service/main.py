@@ -183,3 +183,11 @@ def recommend(req: RecommendRequest):
                 amt = round(total_budget * pct, 2)
                 result.append({"category": cat, "limit": amt, "percent": round(pct*100, 2)})
             return {"monthlyLimit": total_budget, "suggestedCategories": result}
+
+
+# ml-service/main.py 
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))  # Render sets $PORT, fallback to 8000 locally
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+
