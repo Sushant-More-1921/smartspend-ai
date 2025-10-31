@@ -160,7 +160,7 @@ export function AddTransactionForm({
           <label className="text-sm font-medium">Amount</label>
           <Input
             type="number"
-            step="0.01"
+            step="1"
             placeholder="0.00"
             {...register("amount")}
             onChange={(e) => {
@@ -187,7 +187,7 @@ export function AddTransactionForm({
             <SelectContent className="bg-[#1a1a1a] border border-gray-700 text-gray-200">
               {accounts.map((account) => (
                 <SelectItem key={account.id} value={account.id}>
-                  {account.name} (${parseFloat(account.balance).toFixed(2)})
+                  {account.name} (₹{parseFloat(account.balance).toFixed(2)})
                 </SelectItem>
               ))}
               <CreateAccountDrawer>

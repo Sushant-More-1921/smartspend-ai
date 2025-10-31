@@ -62,7 +62,7 @@ export function AccountCard({ account }) {
 
         {/* Balance */}
         <div className="text-3xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-          ${parseFloat(balance).toFixed(2)}
+          ₹{parseFloat(balance).toFixed(2)}
         </div>
         <p className="mt-1 text-sm text-gray-400">
           {type.charAt(0) + type.slice(1).toLowerCase()} Account

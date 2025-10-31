@@ -100,13 +100,13 @@ export function AccountChart({ transactions }) {
           <div className="text-center">
             <p className="text-gray-400">Total Income</p>
             <p className="text-lg font-bold text-green-400">
-              ${totals.income.toFixed(2)}
+              ₹{totals.income.toFixed(2)}
             </p>
           </div>
           <div className="text-center">
             <p className="text-gray-400">Total Expenses</p>
             <p className="text-lg font-bold text-red-400">
-              ${totals.expense.toFixed(2)}
+              ₹{totals.expense.toFixed(2)}
             </p>
           </div>
           <div className="text-center">
@@ -118,7 +118,7 @@ export function AccountChart({ transactions }) {
                   : "text-red-400"
               }`}
             >
-              ${(totals.income - totals.expense).toFixed(2)}
+              ₹{(totals.income - totals.expense).toFixed(2)}
             </p>
           </div>
         </div>
@@ -140,12 +140,12 @@ export function AccountChart({ transactions }) {
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
-                tickFormatter={(value) => `$${value}`}
+                tickFormatter={(value) => `₹${value}`}
                 stroke="#aaa"
               />
               <Tooltip
               cursor={{ fill: "transparent" }}
-                formatter={(value) => [`$${value}`, undefined]}
+                formatter={(value) => [`₹${value}`, undefined]}
                 contentStyle={{
                   backgroundColor: "#1a1a1a",
                   border: "1px solid #333",

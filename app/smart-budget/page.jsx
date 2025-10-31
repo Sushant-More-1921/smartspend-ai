@@ -134,7 +134,7 @@ export default function SmartBudgetPage() {
                       {item.category}
                     </span>
                     <span className="text-gray-400">
-                      ${item.limit} ({item.percent}%)
+                      ₹{item.limit} ({item.percent}%)
                     </span>
                   </li>
                 ))}
