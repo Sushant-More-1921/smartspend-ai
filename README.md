@@ -2,6 +2,8 @@
 
 An AI-powered personal finance management platform designed to track expenses, analyze spending behaviors, predict future financial trends, scan receipts automatically, and deliver intelligent budget insights using Next.js and a Python FastAPI machine learning microservice.
 
+
+![SmartSpend AI Dashboard Preview](public/Main%20SS.png)
 ---
 
 ## Key Features
