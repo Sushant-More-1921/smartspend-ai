@@ -111,7 +111,9 @@ export function DashboardOverview({ accounts, transactions }) {
                       {transaction.description || "Untitled Transaction"}
                     </p>
                     <p className="text-xs text-gray-400">
-                      {format(new Date(transaction.date), "PP")}
+                      {transaction.date && !isNaN(new Date(transaction.date).getTime())
+                        ? format(new Date(transaction.date), "PP")
+                        : "N/A"}
                     </p>
                   </div>
                   <div

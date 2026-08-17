@@ -1,6 +1,7 @@
 # SmartSpend AI 💸🤖
 **Personal Finance AI Assistant built with Next.js, Supabase, Prisma, Tailwind, Inngest, ArcJet, and Shadcn UI** 🔥🔥  
 
+<<<<<<< Updated upstream
 SmartSpend AI helps you **track, analyze, and optimize your spending** with the power of AI.  
 This repo includes both the **frontend (Next.js)** and a **machine learning microservice (FastAPI)**.  
 
@@ -16,6 +17,12 @@ This repo includes both the **frontend (Next.js)** and a **machine learning micr
 ✅ Beautiful Shadcn UI  
 ✅ Background tasks for expense analysis  
 ✅ Extensible ML API with FastAPI  
+=======
+![Main Screenshot](public/Main%20SS.png)  
+
+SmartSpend AI helps you **track, analyze, and optimize your spending** with the power of AI.  
+This repo includes both the **frontend (Next.js)** and a **machine learning microservice (FastAPI)**.  
+>>>>>>> Stashed changes
 
 ---
 
@@ -94,8 +101,13 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+<<<<<<< Updated upstream
 NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/onboarding
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/onboarding
+=======
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+>>>>>>> Stashed changes
 
 GEMINI_API_KEY=
 
@@ -103,4 +115,19 @@ RESEND_API_KEY=
 
 ARCJET_KEY=
 ```
+<<<<<<< Updated upstream
 ---
+=======
+
+---
+
+## 📚 Features  
+✅ AI-powered spending recommendations  
+✅ Budget tracking with Supabase  
+✅ Real-time alerts via Inngest  
+✅ Secure authentication (clerk Auth)  
+✅ Beautiful Shadcn UI  
+✅ Background tasks for expense analysis  
+✅ Extensible ML API with FastAPI  
+
+>>>>>>> Stashed changes

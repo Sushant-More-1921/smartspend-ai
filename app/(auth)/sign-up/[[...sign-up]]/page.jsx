@@ -28,12 +28,12 @@ export default function Page() {
           ease: "easeOut",
           boxShadow: { duration: 1, repeat: Infinity, ease: "easeInOut" },
         }}
-        className="relative w-full mt-14 max-w-4xl h-[550px]  flex rounded-2xl overflow-hidden 
-             bg-[#120623]/60 border border-purple-400 backdrop-blur-lg"
+        className="relative w-full my-10 max-w-4xl min-h-[550px] h-auto flex flex-col md:flex-row rounded-2xl overflow-hidden 
+             bg-[#120623]/60 border border-purple-400 backdrop-blur-lg shadow-2xl"
       >
         {/* LEFT info panel */}
         <div
-          className="hidden md:flex flex-col justify-center items-center w-1/2 px-10 text-white
+          className="hidden md:flex flex-col justify-center items-center w-1/2 p-10 text-white
                      bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-400"
         >
           <h1 className="text-3xl font-extrabold mb-3">Create an Account</h1>
@@ -44,26 +44,23 @@ export default function Page() {
 
         {/* RIGHT sign-up form */}
         <div
-          className="w-full md:w-1/2 flex justify-center items-center p-10 
+          className="w-full md:w-1/2 flex justify-center items-center p-6 md:p-10 
                      bg-gradient-to-b from-[#1c0944]/90 to-[#120623]/90 
-                     backdrop-blur-md "
+                     backdrop-blur-md overflow-y-auto"
         >
-          <div className={`transition-opacity duration-500 ${mounted ? "opacity-100" : "opacity-0"}`}>
-          <SignUp
-            appearance={{
-              variables: {
-                colorPrimary: "#c084fc",
-              },
-              elements: {
-                formButtonPrimary:
-                  "bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-semibold py-2 px-4 rounded-lg transition",
-                footer: "hidden",
-                footerAction: "hidden",
-                footerActionText: "hidden",
-                footerActionLink: "hidden",
-              },
-            }}
-          />
+          <div className={`w-full flex justify-center transition-opacity duration-500 ${mounted ? "opacity-100" : "opacity-0"}`}>
+            <SignUp
+              appearance={{
+                variables: {
+                  colorPrimary: "#c084fc",
+                },
+                elements: {
+                  formButtonPrimary:
+                    "bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-semibold py-2 px-4 rounded-lg transition",
+                  card: "bg-transparent shadow-none border-none",
+                },
+              }}
+            />
           </div>
         </div>
       </motion.div>

@@ -104,7 +104,7 @@ export function AddTransactionForm({
       if (scannedData.category) {
         setValue("category", scannedData.category);
       }
-      toast.success("Receipt scanned successfully");
+      toast.success("Receipt scanned successfully", { id: "receipt-scan-toast" });
     }
   };
 
@@ -113,7 +113,8 @@ export function AddTransactionForm({
       toast.success(
         editMode
           ? "Transaction updated successfully"
-          : "Transaction created successfully"
+          : "Transaction created successfully",
+        { id: "transaction-action-toast" }
       );
       reset();
       router.push(`/account/${transactionResult.data.accountId}`);

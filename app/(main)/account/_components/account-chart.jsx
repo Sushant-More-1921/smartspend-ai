@@ -44,7 +44,9 @@ export function AccountChart({ transactions }) {
     );
 
     const grouped = filtered.reduce((acc, transaction) => {
-      const date = format(new Date(transaction.date), "MMM dd");
+      const date = transaction.date && !isNaN(new Date(transaction.date).getTime())
+        ? format(new Date(transaction.date), "MMM dd")
+        : "N/A";
       if (!acc[date]) {
         acc[date] = { date, income: 0, expense: 0 };
       }

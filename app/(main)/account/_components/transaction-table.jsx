@@ -363,7 +363,9 @@ export function TransactionTable({ transactions }) {
                     />
                   </TableCell>
                   <TableCell className="text-white">
-                    {format(new Date(transaction.date), "PP")}
+                    {transaction.date && !isNaN(new Date(transaction.date).getTime())
+                      ? format(new Date(transaction.date), "PP")
+                      : "N/A"}
                   </TableCell>
                   <TableCell className="text-white">
                     {transaction.description}
@@ -411,10 +413,9 @@ export function TransactionTable({ transactions }) {
                             <div className="text-sm">
                               <div className="font-medium">Next Date:</div>
                               <div>
-                                {format(
-                                  new Date(transaction.nextRecurringDate),
-                                  "PPP"
-                                )}
+                                {transaction.nextRecurringDate && !isNaN(new Date(transaction.nextRecurringDate).getTime())
+                                  ? format(new Date(transaction.nextRecurringDate), "PPP")
+                                  : "N/A"}
                               </div>
                             </div>
                           </TooltipContent>

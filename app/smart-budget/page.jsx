@@ -27,10 +27,18 @@ export default function SmartBudgetPage() {
 
   const generateRecommendation = async () => {
     setError("");
-    if (!email) {
-      setError("Please enter your email (used to fetch past spend).");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email || !email.trim()) {
+      setError("Please enter your email.");
       return;
     }
+
+    if (!emailRegex.test(email.trim())) {
+      setError("Invalid Email");
+      return;
+    }
+
     if (!budget || Number(budget) <= 0) {
       setError("Enter a valid budget amount.");
       return;
@@ -120,7 +128,7 @@ export default function SmartBudgetPage() {
               <h2 className="text-xl font-semibold text-gray-200">
                 Recommended Monthly Limit:{" "}
                 <span className="text-purple-400">
-                  ${recommendation.monthlyLimit}
+                  ₹{recommendation.monthlyLimit}
                 </span>
               </h2>
 

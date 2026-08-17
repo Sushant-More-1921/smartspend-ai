@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { CheckCircle2, AlertTriangle, TrendingUp } from "lucide-react";
+import { CheckCircle2, TrendingUp } from "lucide-react";
 
 export default function FutureSpendPage() {
   const [userInput, setUserInput] = useState("");

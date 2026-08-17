@@ -134,23 +134,46 @@ export async function createAccount(data) {
   }
 }
 
-export async function getDashboardData() {
+export async function getDashboardOverviewData() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
   const user = await db.user.findUnique({
     where: { clerkUserId: userId },
+    select: {
+      id: true,
+      accounts: {
+        orderBy: { createdAt: "desc" },
+        include: {
+          _count: {
+            select: { transactions: true },
+          },
+        },
+      },
+      transactions: {
+        orderBy: { date: "desc" },
+        select: {
+          id: true,
+          type: true,
+          amount: true,
+          description: true,
+          date: true,
+          category: true,
+          accountId: true,
+        },
+      },
+    },
   });
 
-  if (!user) {
-    throw new Error("User not found");
-  }
+  if (!user) throw new Error("User not found");
 
-  // Get all user transactions
-  const transactions = await db.transaction.findMany({
-    where: { userId: user.id },
-    orderBy: { date: "desc" },
-  });
+  return {
+    accounts: (user.accounts || []).map(serializeTransaction),
+    transactions: (user.transactions || []).map(serializeTransaction),
+  };
+}
 
-  return transactions.map(serializeTransaction);
+export async function getDashboardData() {
+  const data = await getDashboardOverviewData();
+  return data.transactions;
 }

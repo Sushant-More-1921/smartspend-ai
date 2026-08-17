@@ -19,20 +19,25 @@ export async function getAccountWithTransactions(accountId) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
-  if (!user) throw new Error("User not found");
-
-  const account = await db.account.findUnique({
+  const account = await db.account.findFirst({
     where: {
       id: accountId,
-      userId: user.id,
+      user: { clerkUserId: userId },
     },
     include: {
       transactions: {
         orderBy: { date: "desc" },
+        select: {
+          id: true,
+          type: true,
+          amount: true,
+          description: true,
+          date: true,
+          category: true,
+          receiptUrl: true,
+          isRecurring: true,
+          recurringInterval: true,
+        },
       },
       _count: {
         select: { transactions: true },
@@ -142,8 +147,8 @@ export async function updateDefaultAccount(accountId) {
       data: { isDefault: true },
     });
 
-    revalidatePath("/dashboard");
-    return { success: true, data: serializeTransaction(account) };
+revalidatePath("/dashboard");
+    return { success: true, data: serializeDecimal(account) };
   } catch (error) {
     return { success: false, error: error.message };
   }

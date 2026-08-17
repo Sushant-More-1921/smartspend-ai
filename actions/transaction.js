@@ -103,16 +103,10 @@ export async function getTransaction(id) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
-  if (!user) throw new Error("User not found");
-
-  const transaction = await db.transaction.findUnique({
+  const transaction = await db.transaction.findFirst({
     where: {
       id,
-      userId: user.id,
+      user: { clerkUserId: userId },
     },
   });
 
@@ -221,7 +215,19 @@ export async function getUserTransactions(query = {}) {
       },
     });
 
-    return { success: true, data: transactions };
+    // Serialize Decimal fields (amount and account.balance) for the client
+    const serializedTransactions = transactions.map((transaction) => ({
+      ...transaction,
+      amount: transaction.amount.toNumber(),
+      account: transaction.account
+        ? {
+            ...transaction.account,
+            balance: transaction.account.balance.toNumber(),
+          }
+        : null,
+    }));
+
+    return { success: true, data: serializedTransactions };
   } catch (error) {
     throw new Error(error.message);
   }
@@ -230,11 +236,30 @@ export async function getUserTransactions(query = {}) {
 // Scan Receipt
 export async function scanReceipt(file) {
   try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("Gemini API key is not configured in environment variables");
+    }
+
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    // Convert File to ArrayBuffer
-    const arrayBuffer = await file.arrayBuffer();
-    // Convert ArrayBuffer to Base64
+    let arrayBuffer;
+    let mimeType = "image/jpeg";
+
+    if (file && typeof file.arrayBuffer === "function") {
+      arrayBuffer = await file.arrayBuffer();
+      if (file.type) mimeType = file.type;
+    } else if (file instanceof FormData) {
+      const uploadedFile = file.get("file");
+      if (!uploadedFile) throw new Error("No file provided");
+      arrayBuffer = await uploadedFile.arrayBuffer();
+      if (uploadedFile.type) mimeType = uploadedFile.type;
+    } else {
+      throw new Error("Invalid file format provided");
+    }
+
     const base64String = Buffer.from(arrayBuffer).toString("base64");
 
     const prompt = `
@@ -254,14 +279,14 @@ export async function scanReceipt(file) {
         "category": "string"
       }
 
-      If its not a recipt, return an empty object
+      If it is not a receipt, return an empty object {}
     `;
 
     const result = await model.generateContent([
       {
         inlineData: {
           data: base64String,
-          mimeType: file.type,
+          mimeType: mimeType,
         },
       },
       prompt,
@@ -269,24 +294,39 @@ export async function scanReceipt(file) {
 
     const response = await result.response;
     const text = response.text();
-    const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
 
-    try {
-      const data = JSON.parse(cleanedText);
-      return {
-        amount: parseFloat(data.amount),
-        date: new Date(data.date),
-        description: data.description,
-        category: data.category,
-        merchantName: data.merchantName,
-      };
-    } catch (parseError) {
-      console.error("Error parsing JSON response:", parseError);
-      throw new Error("Invalid response format from Gemini");
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("Could not extract valid JSON from Gemini response");
     }
+
+    const data = JSON.parse(jsonMatch[0]);
+
+    if (!data || Object.keys(data).length === 0 || data.amount === undefined) {
+      throw new Error("Could not detect receipt details from image");
+    }
+
+    const validCategories = [
+      "housing", "transportation", "groceries", "utilities",
+      "entertainment", "food", "shopping", "healthcare",
+      "education", "personal", "travel", "insurance",
+      "gifts", "bills", "other-expense"
+    ];
+
+    const category = validCategories.includes(data.category)
+      ? data.category
+      : "other-expense";
+
+    return {
+      amount: parseFloat(data.amount) || 0,
+      date: data.date ? new Date(data.date) : new Date(),
+      description: data.description || "",
+      category: category,
+      merchantName: data.merchantName || "",
+    };
   } catch (error) {
     console.error("Error scanning receipt:", error);
-    throw new Error("Failed to scan receipt");
+    throw new Error(error.message || "Failed to scan receipt");
   }
 }
 

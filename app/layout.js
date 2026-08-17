@@ -1,9 +1,9 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header";
+import NavigationProgress from "@/components/NavigationProgress";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
-import Preloader from "@/components/Preloader";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
           <link rel="icon" href="/logo-sm.png" sizes="any"  />
         </head>
         <body className={`${inter.className}`}>
-        <Preloader />
+          <NavigationProgress />
           <Header />
           <main className="min-h-screen">{children}</main>
           <Toaster richColors />

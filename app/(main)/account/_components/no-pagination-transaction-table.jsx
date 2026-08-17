@@ -325,7 +325,9 @@ export function NoPaginationTransactionTable({ transactions }) {
                     />
                   </TableCell>
                   <TableCell>
-                    {format(new Date(transaction.date), "PP")}
+                    {transaction.date && !isNaN(new Date(transaction.date).getTime())
+                      ? format(new Date(transaction.date), "PP")
+                      : "N/A"}
                   </TableCell>
                   <TableCell>{transaction.description}</TableCell>
                   <TableCell className="capitalize">

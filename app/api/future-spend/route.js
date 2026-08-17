@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
 
 export async function POST(req) {
   try {
@@ -24,21 +18,19 @@ export async function POST(req) {
       body.prompt?.trim() || "How does my recent spending affect my budget?";
 
     // --- Budget data ---
-    const { data: budgetData } = await supabase
-      .from("budgets")
-      .select("amount")
-      .eq("userId", user.id)
-      .order("createdAt", { ascending: false })
-      .limit(1)
-      .single();
+    const budgetData = await db.budget.findFirst({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+      select: { amount: true },
+    });
 
     // --- Transactions ---
-    const { data: transactions } = await supabase
-      .from("transactions")
-      .select("amount, type, date, category")
-      .eq("userId", user.id)
-      .order("date", { ascending: false })
-      .limit(100);
+    const transactions = await db.transaction.findMany({
+      where: { userId: user.id },
+      orderBy: { date: "desc" },
+      take: 100,
+      select: { amount: true, type: true, date: true, category: true },
+    });
 
     const cleanedTx = (transactions || []).map((t) => ({
       ...t,
@@ -123,7 +115,7 @@ User Context:
 
     // --- Gemini API call ---
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -149,7 +141,7 @@ User Context:
         ?.trim()
         ?.match(/\{[\s\S]*\}/)?.[0];
       parsed = JSON.parse(cleanText);
-    } catch (err) {
+    } catch {
       console.error("Gemini JSON parse error:", textResponse);
       parsed = {
         summary: ["AI summary unavailable. Please try again later."],

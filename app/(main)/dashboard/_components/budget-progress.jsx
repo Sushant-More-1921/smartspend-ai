@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Pencil, Check, X } from "lucide-react";
 import useFetch from "@/hooks/use-fetch";
@@ -18,7 +17,6 @@ import { updateBudget } from "@/actions/budget";
 import Link from "next/link";
 
 export function BudgetProgress({ initialBudget, currentExpenses }) {
-  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [newBudget, setNewBudget] = useState(
     initialBudget?.amount?.toString() || ""
