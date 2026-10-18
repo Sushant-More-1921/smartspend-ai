@@ -1,41 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { CheckCircle2, TrendingUp } from "lucide-react";
+import { CheckCircle2, TrendingUp, Loader2 } from "lucide-react";
 
 export default function FutureSpendPage() {
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  const handleSubmit = async () => {
-    if (!userInput.trim()) {
-      setError("Please enter a valid question.");
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    setResult(null);
-
+  const fetchForecast = useCallback(async (promptText = "") => {
     try {
+      setError(null);
       const res = await fetch("/api/future-spend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: userInput }),
+        body: JSON.stringify({ prompt: promptText }),
       });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.error || "Unexpected error occurred");
 
       setResult({
         summary: Array.isArray(data.summary) ? data.summary : [],
         budget: Number(data.budget) || 0,
-        spent: Number(data.spentThisMonth) || 0,
+        spent: Number(data.spentThisMonth ?? data.spent) || 0,
         remaining: Number(data.remaining) || 0,
         monthlyProjection: Array.isArray(data.monthlyProjection)
           ? data.monthlyProjection.map((m) => ({
@@ -47,9 +39,30 @@ export default function FutureSpendPage() {
     } catch (err) {
       console.error("Error fetching prediction:", err);
       setError("Failed to get prediction. Please try again later.");
-    } finally {
-      setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      setInitialLoading(true);
+      await fetchForecast("");
+      if (isMounted) setInitialLoading(false);
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchForecast]);
+
+  const handleSubmit = async () => {
+    if (!userInput.trim()) {
+      setError("Please enter a valid question or scenario.");
+      return;
+    }
+
+    setLoading(true);
+    await fetchForecast(userInput);
+    setLoading(false);
   };
 
   return (
@@ -89,6 +102,14 @@ export default function FutureSpendPage() {
           >
              {error}
           </motion.div>
+        )}
+
+        {/* Initial Loading State */}
+        {initialLoading && (
+          <div className="mt-10 p-12 rounded-xl bg-black/30 border border-purple-500/20 flex flex-col items-center justify-center space-y-3">
+            <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
+            <p className="text-sm text-purple-300">Computing forecasting model & spending baseline...</p>
+          </div>
         )}
 
         {/* Results */}

@@ -76,12 +76,23 @@ export async function createTransaction(data) {
     const balanceChange = data.type === "EXPENSE" ? -data.amount : data.amount;
     const newBalance = currentBalance + balanceChange;
 
+    // If the transaction date is today, retain the current timestamp so date has full time precision
+    let transactionDate = new Date(data.date);
+    const now = new Date();
+    if (
+      transactionDate.getFullYear() === now.getFullYear() &&
+      transactionDate.getMonth() === now.getMonth() &&
+      transactionDate.getDate() === now.getDate()
+    ) {
+      transactionDate = now;
+    }
+
     // Create transaction and update account balance
     const transaction = await db.$transaction(async (tx) => {
       const newTransaction = await tx.transaction.create({
         data: {
           ...data,
-          date: new Date(data.date),
+          date: transactionDate,
           userId: user.id,
           nextRecurringDate:
             data.isRecurring && data.recurringInterval
@@ -233,6 +244,16 @@ export async function updateTransaction(id, data) {
         });
       }
 
+      let transactionDate = new Date(data.date);
+      const now = new Date();
+      if (
+        transactionDate.getFullYear() === now.getFullYear() &&
+        transactionDate.getMonth() === now.getMonth() &&
+        transactionDate.getDate() === now.getDate()
+      ) {
+        transactionDate = now;
+      }
+
       const updated = await tx.transaction.update({
         where: {
           id,
@@ -240,7 +261,7 @@ export async function updateTransaction(id, data) {
         },
         data: {
           ...data,
-          date: new Date(data.date),
+          date: transactionDate,
           nextRecurringDate:
             data.isRecurring && data.recurringInterval
               ? calculateNextRecurringDate(data.date, data.recurringInterval)

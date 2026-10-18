@@ -101,12 +101,26 @@ export function TransactionTable({ transactions }) {
       let comparison = 0;
       switch (sortConfig.field) {
         case "date": {
-          const dateA = new Date(a.date).getTime();
-          const dateB = new Date(b.date).getTime();
-          const createdA = a.createdAt ? new Date(a.createdAt).getTime() : dateA;
-          const createdB = b.createdAt ? new Date(b.createdAt).getTime() : dateB;
+          const rawA = new Date(a.date);
+          const rawB = new Date(b.date);
+          const dayA = new Date(
+            rawA.getFullYear(),
+            rawA.getMonth(),
+            rawA.getDate()
+          ).getTime();
+          const dayB = new Date(
+            rawB.getFullYear(),
+            rawB.getMonth(),
+            rawB.getDate()
+          ).getTime();
+          const createdA = a.createdAt
+            ? new Date(a.createdAt).getTime()
+            : rawA.getTime();
+          const createdB = b.createdAt
+            ? new Date(b.createdAt).getTime()
+            : rawB.getTime();
 
-          comparison = dateA - dateB;
+          comparison = dayA - dayB;
           if (comparison === 0) {
             comparison = createdA - createdB;
           }
