@@ -48,6 +48,7 @@ export async function createTransaction(data) {
 
     const user = await db.user.findUnique({
       where: { clerkUserId: userId },
+      select: { id: true },
     });
 
     if (!user) {
@@ -147,6 +148,7 @@ export async function updateTransaction(id, data) {
 
     const user = await db.user.findUnique({
       where: { clerkUserId: userId },
+      select: { id: true },
     });
 
     if (!user) throw new Error("User not found");
@@ -299,6 +301,7 @@ export async function getUserTransactions(query = {}) {
 
     const user = await db.user.findUnique({
       where: { clerkUserId: userId },
+      select: { id: true },
     });
 
     if (!user) {

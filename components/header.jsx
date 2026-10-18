@@ -1,5 +1,5 @@
-// header.jsx
 "use client";
+
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -20,44 +20,47 @@ const Header = () => {
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Financial Goals", href: "/goals" },
-    { name: "Future Spend", href: "/future-spend" },
-    { name: "Smart Budget", href: "/smart-budget" },
-    { name: "Monthly Reports", href: "/reports" },
+    { name: "Features", href: "/#features" },
+    { name: "How It Works", href: "/#how-it-works" },
+    { name: "About", href: "/#about" },
   ];
 
   return (
     <>
-      <header className="fixed top-0 w-full bg-[#090314]/90 backdrop-blur-xl z-50 border-b border-purple-500/20 shadow-[0_4px_25px_rgba(147,51,234,0.15)]">
-        <nav className="w-full px-4 md:px-6 py-2.5 flex items-center justify-between gap-4 md:gap-8">
+      <header className="fixed top-0 w-full bg-white/95 backdrop-blur-md z-50 border-b border-slate-200/80 shadow-xs">
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
           
-          {/* Left Corner: Brand Logo */}
-          <Link href="/" prefetch={true} className="flex items-center text-lg font-semibold tracking-tight mr-6 md:mr-10 shrink-0 hover:opacity-90 transition-opacity">
+          {/* Brand Logo */}
+          <Link
+            href="/"
+            prefetch={true}
+            className="flex items-center text-lg font-bold tracking-tight shrink-0 hover:opacity-90 transition-opacity"
+          >
             <Image
               src="/logo-sm.png"
-              alt="SmartSpend Ai Logo"
+              alt="SmartSpend AI Logo"
               width={32}
               height={32}
-              className="w-8 h-8 rounded-full mr-2"
+              className="w-8 h-8 rounded-lg mr-2.5 object-cover"
               priority
             />
-            <span className="text-white">Smart</span>
-            <span className="text-white ml-1">Spend Ai</span>
+            <span className="text-black font-extrabold tracking-tight">SmartSpend</span>
+            <span className="text-black font-extrabold ml-1">AI</span>
           </Link>
 
-          {/* Middle: Single-Row Floating Glass Navigation Capsule */}
-          <div className="hidden md:flex items-center gap-1 bg-[#160a2c]/85 border border-purple-500/30 px-3 py-1 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-md whitespace-nowrap">
+          {/* Clean Desktop Navigation Links */}
+          <div className="hidden md:flex items-center gap-1 bg-slate-100/70 border border-slate-200/60 p-1 rounded-xl">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
                 <Link
-                  key={link.href}
+                  key={link.name}
                   href={link.href}
                   prefetch={true}
-                  className={`px-3 py-1 text-xs font-semibold rounded-full transition-all duration-200 hover:scale-105 ${
+                  className={`px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all ${
                     isActive
-                      ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-[0_0_12px_rgba(168,85,247,0.5)] font-bold"
-                      : "text-gray-300 hover:text-white hover:bg-purple-600/30 hover:shadow-[0_0_10px_rgba(168,85,247,0.3)]"
+                      ? "bg-white text-blue-600 shadow-xs font-semibold"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
                   }`}
                 >
                   {link.name}
@@ -66,17 +69,20 @@ const Header = () => {
             })}
           </div>
 
-          {/* Right Side: Action Buttons in Single Row */}
-          <div className="flex items-center space-x-2.5 shrink-0">
+          {/* Right Action Buttons */}
+          <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
             <SignedIn>
               <Link href="/dashboard" prefetch={true}>
-                <Button className="gap-1.5 px-3.5 py-1 text-xs font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:from-purple-500 hover:to-pink-500 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:shadow-[0_0_20px_rgba(168,85,247,0.7)] hover:scale-105 transition-all rounded-full border border-purple-400/30">
+                <Button className="gap-1.5 px-3.5 py-1.5 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-xs transition-colors">
                   <LayoutDashboard size={14} />
                   <span className="hidden sm:inline">Dashboard</span>
                 </Button>
               </Link>
               <Link href="/transaction/create" prefetch={true}>
-                <Button variant="outline" className="gap-1.5 px-3.5 py-1 text-xs font-semibold border-purple-400/50 text-black hover:bg-purple-600/20 hover:text-white hover:border-purple-300 hover:scale-105 rounded-full transition-all backdrop-blur-sm">
+                <Button
+                  variant="outline"
+                  className="gap-1.5 px-3.5 py-1.5 text-xs font-semibold border-slate-300 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                >
                   <PenBox size={14} />
                   <span className="hidden sm:inline">Add Transaction</span>
                 </Button>
@@ -87,14 +93,14 @@ const Header = () => {
               <SignInButton forceRedirectUrl="/dashboard">
                 <Button
                   variant="outline"
-                  className="px-3.5 py-1 text-xs font-semibold border-purple-500/50 text-purple-300 hover:bg-purple-600/20 hover:text-white hover:scale-105 rounded-full transition-all"
+                  className="px-3.5 py-1.5 text-xs font-semibold border-slate-300 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
                 >
-                  Login
+                  Sign In
                 </Button>
               </SignInButton>
               <SignUpButton forceRedirectUrl="/dashboard">
-                <Button className="px-4 py-1 text-xs font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:opacity-95 hover:scale-105 text-white shadow-[0_0_15px_rgba(168,85,247,0.5)] rounded-full transition-all">
-                  Sign Up
+                <Button className="px-4 py-1.5 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-xs transition-colors">
+                  Get Started Free
                 </Button>
               </SignUpButton>
             </SignedOut>
@@ -104,50 +110,24 @@ const Header = () => {
                 appearance={{
                   variables: {
                     colorBackground: "#ffffff",
-                    colorText: "#000000",
-                    colorTextSecondary: "#374151",
+                    colorText: "#0f172a",
+                    colorTextSecondary: "#64748b",
                     colorInputBackground: "#ffffff",
-                    colorInputText: "#000000",
+                    colorInputText: "#0f172a",
                   },
                   elements: {
                     avatarBox:
-                      "w-8 h-8 border-2 border-purple-500 shadow-[0_0_12px_rgba(168,85,247,0.5)] hover:scale-110 transition-transform",
+                      "w-8 h-8 rounded-lg border border-slate-200 hover:ring-2 hover:ring-blue-500/20 transition-all",
                     userButtonPopoverCard:
-                      "!bg-white !text-black shadow-2xl border border-gray-200 rounded-2xl",
+                      "!bg-white !text-slate-900 shadow-lg border border-slate-200 rounded-xl",
                     userButtonPopoverActionButton:
-                      "!text-gray-900 hover:!bg-gray-100 transition-colors",
+                      "!text-slate-700 hover:!bg-slate-50 transition-colors",
                     userButtonPopoverActionButtonText:
-                      "!text-gray-900 font-semibold",
+                      "!text-slate-900 font-medium",
                     userButtonPopoverActionButtonIcon:
-                      "!text-gray-700",
+                      "!text-slate-600",
                     userButtonPopoverFooter:
-                      "!bg-gray-50 border-t border-gray-100",
-                  },
-                }}
-                userProfileProps={{
-                  appearance: {
-                    variables: {
-                      colorBackground: "#ffffff",
-                      colorText: "#000000",
-                      colorTextSecondary: "#374151",
-                      colorInputBackground: "#ffffff",
-                      colorInputText: "#000000",
-                    },
-                    elements: {
-                      card: "!bg-white !text-black shadow-2xl border border-gray-200",
-                      modalContent: "!bg-white !text-black",
-                      navbar: "!bg-gray-50 border-r border-gray-200",
-                      navbarButton: "!text-gray-800 hover:!bg-gray-100",
-                      headerTitle: "!text-black font-bold",
-                      headerSubtitle: "!text-gray-600",
-                      profileSectionTitleText: "!text-black font-semibold",
-                      profileSectionContent: "!text-black",
-                      profileSectionPrimaryButton: "!text-purple-600 font-medium",
-                      formFieldLabel: "!text-gray-800 font-medium",
-                      formFieldInput: "!bg-white !text-black border border-gray-300",
-                      breadcrumbsItem: "!text-gray-700",
-                      breadcrumbsItemDivider: "!text-gray-400",
-                    },
+                      "!bg-slate-50 border-t border-slate-100",
                   },
                 }}
               />
@@ -155,41 +135,82 @@ const Header = () => {
 
             {/* Mobile Hamburger Menu Trigger */}
             <button
-              className="md:hidden text-white p-1.5 rounded-full hover:bg-purple-600/25 border border-purple-500/30 transition-colors"
+              className="md:hidden text-slate-700 p-2 rounded-lg hover:bg-slate-100 border border-slate-200 transition-colors"
               onClick={() => setIsOpen(!isOpen)}
-              aria-label="Toggle navigation menu"
+              aria-label="Toggle mobile menu"
             >
               {isOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
         </nav>
-      </header>
 
-      {/* Mobile Glass Dropdown Menu */}
-      {isOpen && (
-        <div className="md:hidden fixed top-14 right-4 w-60 rounded-2xl bg-[#0e051f]/95 border border-purple-500/30 backdrop-blur-2xl z-50 p-3 shadow-[0_10px_30px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-3 duration-200">
-          <div className="flex flex-col space-y-1.5">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              return (
+        {/* Mobile Navigation Drawer */}
+        {isOpen && (
+          <div className="md:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-5 space-y-2 shadow-md">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                prefetch={true}
+                onClick={() => setIsOpen(false)}
+                className={`block px-3.5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  pathname === link.href
+                    ? "bg-blue-50 text-blue-600 font-semibold"
+                    : "text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
+
+            <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
+              <SignedIn>
                 <Link
-                  key={link.href}
-                  href={link.href}
+                  href="/dashboard"
                   prefetch={true}
                   onClick={() => setIsOpen(false)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-all ${
-                    isActive
-                      ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold shadow-[0_0_10px_rgba(168,85,247,0.4)]"
-                      : "text-gray-300 hover:bg-purple-600/20 hover:text-white"
-                  }`}
+                  className="w-full"
                 >
-                  {link.name}
+                  <Button className="w-full gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold py-2">
+                    <LayoutDashboard size={14} />
+                    <span>Go to Dashboard</span>
+                  </Button>
                 </Link>
-              );
-            })}
+                <Link
+                  href="/transaction/create"
+                  prefetch={true}
+                  onClick={() => setIsOpen(false)}
+                  className="w-full"
+                >
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2 border-slate-300 text-slate-700 rounded-lg text-xs font-semibold py-2"
+                  >
+                    <PenBox size={14} />
+                    <span>Add Transaction</span>
+                  </Button>
+                </Link>
+              </SignedIn>
+
+              <SignedOut>
+                <SignInButton forceRedirectUrl="/dashboard">
+                  <Button
+                    variant="outline"
+                    className="w-full border-slate-300 text-slate-700 rounded-lg text-xs font-semibold py-2"
+                  >
+                    Sign In
+                  </Button>
+                </SignInButton>
+                <SignUpButton forceRedirectUrl="/dashboard">
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold py-2 shadow-xs">
+                    Get Started Free
+                  </Button>
+                </SignUpButton>
+              </SignedOut>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </header>
     </>
   );
 };

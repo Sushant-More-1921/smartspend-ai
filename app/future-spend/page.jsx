@@ -1,11 +1,15 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { CheckCircle2, TrendingUp, Loader2 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { CheckCircle2, TrendingUp, Loader2, ArrowLeft, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { PageHeader } from "@/components/ui/page-header";
 
 export default function FutureSpendPage() {
+  const router = useRouter();
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -21,7 +25,11 @@ export default function FutureSpendPage() {
         body: JSON.stringify({ prompt: promptText }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401 || data.error === "Unauthorized" || data.error === "User not found in database") {
+        router.push(`/sign-in?redirect_url=${encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}`);
+        return;
+      }
       if (!res.ok) throw new Error(data.error || "Unexpected error occurred");
 
       setResult({
@@ -40,7 +48,7 @@ export default function FutureSpendPage() {
       console.error("Error fetching prediction:", err);
       setError("Failed to get prediction. Please try again later.");
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     let isMounted = true;
@@ -66,149 +74,180 @@ export default function FutureSpendPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0f051d] via-[#1a093c] to-[#120623] text-white p-6">
-      <div className="max-w-4xl mt-16  mx-auto">
-        {/* Header */}
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-5xl font-extrabold text-center mb-6 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"
-        >
-          Future Spend Predictor
-        </motion.h1>
+    <div className="min-h-screen w-full bg-slate-50 text-slate-900 pt-20 pb-16">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        
+        {/* Breadcrumb Navigation */}
+        <div className="flex items-center justify-between">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Back to Dashboard</span>
+          </Link>
+        </div>
 
-        {/* Text Area */}
-        <textarea
-          value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
-          placeholder='Example: "If I go on a trip to Goa for 5 days, how will it affect my budget this month?"'
-          className="w-full p-4 rounded-xl bg-black/40 border border-purple-500/30 focus:border-purple-400 focus:ring-2 focus:ring-purple-600 outline-none resize-none h-32 text-gray-200 placeholder-gray-500"
+        {/* Page Header */}
+        <PageHeader
+          title="Future Spend Predictor"
+          subtitle="Forecast multi-month expenditure and simulate future purchasing scenarios using local time-series analytics."
+          badge="Proactive Forecasting"
         />
 
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="mt-4 w-full md:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-[0_0_25px_rgba(139,92,246,0.8)] font-semibold"
-        >
-          {loading ? "Simulating..." : "Submit"}
-        </button>
+        {/* Simulator Card */}
+        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 sm:p-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Scenario Simulator
+            </label>
+            <span className="text-xs text-slate-400 flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+              Simulate trips, purchases, or major expenses
+            </span>
+          </div>
 
-        {/* Error Message */}
-        {error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mt-4 p-4 bg-red-500/20 border border-red-400 text-red-300 rounded-lg"
-          >
-             {error}
-          </motion.div>
-        )}
+          <textarea
+            value={userInput}
+            onChange={(e) => setUserInput(e.target.value)}
+            placeholder='Example: "If I go on a trip to Goa for 5 days costing ₹15,000, how will it affect my budget this month?"'
+            className="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none resize-none h-28 text-sm transition-all"
+          />
 
-        {/* Initial Loading State */}
+          <div className="flex items-center justify-between pt-1">
+            <p className="text-xs text-slate-400">
+              Your financial records are evaluated locally without external AI APIs.
+            </p>
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors shadow-xs flex items-center gap-2 disabled:opacity-50"
+            >
+              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+              {loading ? "Simulating..." : "Run Simulation"}
+            </button>
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs font-medium">
+              {error}
+            </div>
+          )}
+        </div>
+
+        {/* Initial Loading Spinner */}
         {initialLoading && (
-          <div className="mt-10 p-12 rounded-xl bg-black/30 border border-purple-500/20 flex flex-col items-center justify-center space-y-3">
-            <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
-            <p className="text-sm text-purple-300">Computing forecasting model & spending baseline...</p>
+          <div className="p-12 rounded-2xl bg-white border border-slate-200/90 flex flex-col items-center justify-center space-y-3 shadow-xs">
+            <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+            <p className="text-sm font-medium text-slate-600">
+              Computing time-series forecasting model & baseline...
+            </p>
           </div>
         )}
 
-        {/* Results */}
+        {/* Forecast Results */}
         <AnimatePresence>
           {result && (
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.5 }}
-              className="mt-10 p-8 rounded-xl bg-black/40 border border-purple-500/30 shadow-lg space-y-8 backdrop-blur-sm"
+              exit={{ opacity: 0, y: 12 }}
+              transition={{ duration: 0.4 }}
+              className="space-y-6"
             >
-              {/*Insights Section */}
+              {/* Key Insights */}
               {result.summary.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <div className="flex items-center gap-2 mb-3">
-                    <TrendingUp className="text-purple-400 w-6 h-6" />
-                    <h2 className="text-2xl font-bold text-purple-400">Key Insights</h2>
+                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="text-blue-600 w-5 h-5" />
+                    <h2 className="text-lg font-bold text-slate-900">
+                      Key Projections & Insights
+                    </h2>
                   </div>
-                  <ul className="space-y-3">
+                  <ul className="space-y-2.5">
                     {result.summary.map((point, idx) => (
-                      <motion.li
+                      <li
                         key={idx}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3 + idx * 0.1 }}
-                        className="flex items-start gap-3 bg-purple-900/20 border border-purple-700/30 rounded-lg p-3 hover:bg-purple-900/30 transition-all duration-300"
+                        className="flex items-start gap-3 bg-slate-50/80 border border-slate-200/70 rounded-xl p-3.5 text-xs text-slate-700 leading-relaxed"
                       >
-                        <CheckCircle2 className="text-green-400 mt-1 w-5 h-5 flex-shrink-0" />
-                        <span className="text-gray-300 leading-relaxed">{point.trim()}</span>
-                      </motion.li>
+                        <CheckCircle2 className="text-emerald-600 mt-0.5 w-4 h-4 shrink-0" />
+                        <span>{point.trim()}</span>
+                      </li>
                     ))}
                   </ul>
-                </motion.div>
+                </div>
               )}
 
-              {/* Budget Overview */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.4 }}
-                className="grid grid-cols-1 sm:grid-cols-3 gap-5 text-center"
-              >
-                <div className="p-4 rounded-lg bg-gradient-to-br from-purple-500/20 to-indigo-500/10 border border-purple-500/30 shadow-md">
-                  <p className="text-2xl font-extrabold text-purple-300">
-                    ₹{result.budget.toLocaleString("en-IN")}
+              {/* Budget Overview Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs text-center">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Monthly Budget
+                  </span>
+                  <p className="text-2xl font-extrabold text-slate-900 mt-1">
+                    ₹{result.budget.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                   </p>
-                  <p className="text-gray-400 text-sm mt-1">Budget</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Configured threshold</p>
                 </div>
-                <div className="p-4 rounded-lg bg-gradient-to-br from-pink-500/20 to-red-500/10 border border-pink-500/30 shadow-md">
-                  <p className="text-2xl font-extrabold text-pink-300">
-                    ₹{result.spent.toLocaleString("en-IN")}
-                  </p>
-                  <p className="text-gray-400 text-sm mt-1">Spent</p>
-                </div>
-                <div className="p-4 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/10 border border-green-500/30 shadow-md">
-                  <p className="text-2xl font-extrabold text-green-300">
-                    ₹{result.remaining.toLocaleString("en-IN")}
-                  </p>
-                  <p className="text-gray-400 text-sm mt-1">Remaining</p>
-                </div>
-              </motion.div>
 
-              {/* Monthly Projection Chart */}
+                <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs text-center">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Current Spend
+                  </span>
+                  <p className="text-2xl font-extrabold text-rose-600 mt-1">
+                    ₹{result.spent.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-0.5">Elapsed month to date</p>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs text-center">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Remaining Buffer
+                  </span>
+                  <p className={`text-2xl font-extrabold mt-1 ${result.remaining >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
+                    ₹{result.remaining.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-0.5">Available before deficit</p>
+                </div>
+              </div>
+
+              {/* 4-Month Projection Chart */}
               {result.monthlyProjection.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 }}
-                >
-                  <h2 className="text-2xl font-semibold text-purple-400 mb-3 flex items-center gap-2">
-                    4-Month Projection
-                  </h2>
-                  <div className="h-72 bg-black/30 rounded-lg p-4 border border-purple-500/20">
+                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 space-y-4">
+                  <div>
+                    <h2 className="text-lg font-bold text-slate-900">
+                      4-Month Expenditure Forecast
+                    </h2>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Recency-weighted baseline projection including simulated scenario impacts
+                    </p>
+                  </div>
+                  <div className="h-72 pt-4">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={result.monthlyProjection}>
-                        <XAxis dataKey="month" stroke="#aaa" />
-                        <YAxis stroke="#aaa" />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                        <XAxis dataKey="month" stroke="#64748b" fontSize={12} tickLine={false} />
+                        <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => `₹${v}`} />
                         <Tooltip
                           contentStyle={{
-                            background: "#1a093c",
-                            border: "1px solid #444",
+                            backgroundColor: "#ffffff",
+                            border: "1px solid #e2e8f0",
                             borderRadius: "10px",
+                            boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.08)",
+                            color: "#0f172a",
                           }}
-                          labelStyle={{ color: "#fff" }}
+                          labelStyle={{ color: "#64748b", fontWeight: 600 }}
                           formatter={(value) => [
                             `₹${Number(value).toLocaleString("en-IN")}`,
                             "Projected Spend",
                           ]}
                         />
-                        <Bar dataKey="value" fill="#a78bfa" radius={[6, 6, 0, 0]} />
+                        <Bar dataKey="value" fill="#2563EB" radius={[6, 6, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
-                </motion.div>
+                </div>
               )}
             </motion.div>
           )}

@@ -23,6 +23,7 @@ export async function getUserAccounts() {
 
   const user = await db.user.findUnique({
     where: { clerkUserId: userId },
+    select: { id: true },
   });
 
   if (!user) {
@@ -84,6 +85,7 @@ export async function createAccount(data) {
 
     const user = await db.user.findUnique({
       where: { clerkUserId: userId },
+      select: { id: true },
     });
 
     if (!user) {
@@ -102,6 +104,7 @@ export async function createAccount(data) {
     // Check if this is the user's first account
     const existingAccounts = await db.account.findMany({
       where: { userId: user.id },
+      select: { name: true, isDefault: true },
     });
 
     const accountNameTrimmed = data.name.trim();

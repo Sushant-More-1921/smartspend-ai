@@ -1,11 +1,11 @@
 "use client";
+
 import { useState } from "react";
-import { Pencil, Check, X } from "lucide-react";
+import { Pencil, Check, X, Sparkles, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { updateBudget } from "@/actions/budget";
 import Link from "next/link";
-import Image from "next/image";
 
 export function BudgetProgress({ initialBudget, currentExpenses }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -23,9 +22,9 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
     initialBudget?.amount?.toString() || ""
   );
 
-  const percentUsed = initialBudget
-    ? (currentExpenses / initialBudget.amount) * 100
-    : 0;
+  const budgetAmount = initialBudget?.amount ? Number(initialBudget.amount) : 0;
+  const percentUsed = budgetAmount > 0 ? (currentExpenses / budgetAmount) * 100 : 0;
+  const remaining = Math.max(0, budgetAmount - currentExpenses);
 
   const handleUpdateBudget = async () => {
     const amount = parseFloat(newBudget);
@@ -56,99 +55,115 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
     setIsEditing(false);
   };
 
+  const isWarning = percentUsed >= 75 && percentUsed < 90;
+  const isDanger = percentUsed >= 90;
+
   return (
-    <Card className="group relative rounded-2xl bg-gradient-to-b from-[#0a0a0a] to-[#111] border border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300">
-      {/* Glassy overlay for subtle shine */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 via-transparent to-white/5 pointer-events-none" />
+    <Card className="rounded-2xl bg-white border border-slate-200/90 shadow-xs p-2">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200/60 flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 text-emerald-600" />
+            </div>
+            <div>
+              <CardTitle className="text-base font-bold text-slate-900">
+                Monthly Spending Budget
+              </CardTitle>
+              <p className="text-xs text-slate-500">
+                Default Account Spending Limit
+              </p>
+            </div>
+          </div>
 
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-        <div className="flex-1">
-          <CardTitle className="text-sm font-semibold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-            Monthly Budget (Default Account)
-          </CardTitle>
-
-          <div className="flex items-center gap-2 mt-1 text-white">
-            {isEditing ? (  
+          <div className="flex items-center gap-2 mt-3">
+            {isEditing ? (
               <div className="flex items-center gap-2">
                 <Input
                   type="number"
                   value={newBudget}
                   onChange={(e) => setNewBudget(e.target.value)}
-                  className="w-32 bg-transparent border-gray-600 text-white"
-                  placeholder="Enter amount"
+                  className="w-36 h-8 text-sm bg-white border-slate-300 text-slate-900 rounded-lg"
+                  placeholder="Enter limit"
                   autoFocus
                   disabled={isLoading}
                 />
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="icon"
                   onClick={handleUpdateBudget}
                   disabled={isLoading}
-                  className="hover:hover:bg-purple-400"
+                  className="h-8 w-8 text-emerald-600 border-emerald-300 hover:bg-emerald-50 rounded-lg"
                 >
-                  <Check className="h-4 w-4 text-green-400" />
+                  <Check className="h-4 w-4" />
                 </Button>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="icon"
                   onClick={handleCancel}
                   disabled={isLoading}
-                  className="hover:hover:bg-purple-400"
+                  className="h-8 w-8 text-slate-500 border-slate-300 hover:bg-slate-100 rounded-lg"
                 >
-                  <X className="h-4 w-4 text-red-400" />
+                  <X className="h-4 w-4" />
                 </Button>
               </div>
             ) : (
-              <>
-                <CardDescription className="text-gray-300">
-                  {initialBudget
-                    ? `₹${currentExpenses.toFixed(
-                        2
-                      )} of ₹${initialBudget.amount.toFixed(2)} spent`
-                    : "No budget set"}
-                </CardDescription>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-slate-900">
+                  {budgetAmount > 0
+                    ? `₹${currentExpenses.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} of ₹${budgetAmount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} spent`
+                    : "No monthly budget configured"}
+                </span>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setIsEditing(true)}
-                  className="h-6 w-6 hover:bg-purple-400"
+                  className="h-7 w-7 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg"
+                  title="Edit budget"
                 >
-                  <Pencil className="h-3 w-3 text-gray-300" />
+                  <Pencil className="h-3.5 w-3.5" />
                 </Button>
-              </>
+              </div>
             )}
           </div>
         </div>
 
-        <Link href="/smart-budget" prefetch={true}>
+        <Link href="/smart-budget" prefetch={true} className="shrink-0">
           <Button
-            className="ml-3 inline-flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-white shadow-md transition-all bg-gradient-to-br from-orange-500 via-pink-500 to-purple-600 hover:opacity-90 hover:scale-[1.02]"
-            type="button"
+            variant="outline"
+            className="gap-2 border-blue-200 bg-blue-50/70 hover:bg-blue-100/70 text-blue-700 font-semibold text-xs rounded-xl px-4 py-2 h-auto shadow-2xs transition-colors"
           >
-            Smart Budget Recommendation
-            <Image src="/ai-technology.png" alt="AI" width={20} height={20} className="h-5 w-5" />
+            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+            <span>Smart Recommendations</span>
           </Button>
         </Link>
       </CardHeader>
 
-      <CardContent className="relative z-10">
-        {initialBudget && (
+      <CardContent className="pt-0">
+        {budgetAmount > 0 ? (
           <div className="space-y-2">
             <Progress
-              value={percentUsed}
-              className="h-2 bg-gray-700 rounded-full"
-              extraStyles={`${
-                percentUsed >= 90
-                  ? "bg-red-500"
-                  : percentUsed >= 75
-                  ? "bg-yellow-500"
-                  : "bg-purple-400"
-              }`}
+              value={Math.min(100, percentUsed)}
+              className="h-2.5 bg-slate-100 rounded-full"
+              extraStyles={
+                isDanger
+                  ? "bg-rose-500"
+                  : isWarning
+                  ? "bg-amber-500"
+                  : "bg-emerald-500"
+              }
             />
-            <p className="text-xs text-gray-400 text-right">
-              {percentUsed.toFixed(1)}% used
-            </p>
+            <div className="flex justify-between items-center text-xs text-slate-500 pt-0.5">
+              <span>Remaining: <strong className="text-slate-800">₹{remaining.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></span>
+              <span className={`font-semibold ${isDanger ? "text-rose-600" : isWarning ? "text-amber-600" : "text-emerald-600"}`}>
+                {percentUsed.toFixed(1)}% used
+              </span>
+            </div>
           </div>
+        ) : (
+          <p className="text-xs text-slate-400 italic">
+            Click the edit button above to assign a spending ceiling for this month.
+          </p>
         )}
       </CardContent>
     </Card>

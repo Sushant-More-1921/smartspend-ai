@@ -1,11 +1,17 @@
-// app/smart-budget/page.jsx
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useUser } from "@clerk/nextjs";
+import { Sparkles, ArrowLeft, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { PageHeader } from "@/components/ui/page-header";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function SmartBudgetPage() {
+  const router = useRouter();
   const { user } = useUser();
   const userEmail = user?.primaryEmailAddress?.emailAddress || "";
   const [email, setEmail] = useState(() => {
@@ -25,7 +31,6 @@ export default function SmartBudgetPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [recommendation, setRecommendation] = useState(null);
-
 
   const generateRecommendation = async () => {
     setError("");
@@ -54,7 +59,11 @@ export default function SmartBudgetPage() {
         body: JSON.stringify({ email: email.trim(), total_budget: Number(budget) }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401 || data?.error === "Unauthorized" || data?.error === "User not found in database") {
+        router.push(`/sign-in?redirect_url=${encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}`);
+        return;
+      }
       if (data?.error) {
         setError(data.error || "Failed to get recommendation");
       } else {
@@ -72,88 +81,128 @@ export default function SmartBudgetPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0f051d] via-[#1a093c] to-[#120623] text-white pt-20 p-6">
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="max-w-3xl mx-auto"
-      >
-        <h1 className="mt-4 text-3xl sm:text-5xl font-extrabold text-center tracking-tight bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-          Smart Budget Recommendation
-        </h1>
+    <div className="min-h-screen w-full bg-slate-50 text-slate-900 pt-20 pb-16">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-8">
+        
+        {/* Breadcrumb Navigation */}
+        <div className="flex items-center justify-between">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Back to Dashboard</span>
+          </Link>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 1}}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
-          className="mt-8 bg-[#1e1133] shadow-lg rounded-2xl p-8 space-y-4 border border-purple-800/30 hover:shadow-purple-600/60 transition"
-        >
-          <p className="text-gray-300">
-            Get personalized budget suggestions based on your spending patterns.
-          </p>
+        {/* Page Header */}
+        <PageHeader
+          title="Smart Budget Recommendation"
+          subtitle="Generate tailored category allocation recommendations based on machine-learned spending patterns."
+          badge="Intelligent Allocations"
+        />
 
-          <input
-            type="email"
-            placeholder="Your account email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 border rounded-lg bg-[#0f051d] border-purple-700/40 text-white placeholder-gray-400"
-          />
-
-          <input
-            type="number"
-            placeholder="Enter total monthly budget"
-            value={budget}
-            onChange={(e) => setBudget(e.target.value)}
-            className="w-full p-3 border rounded-lg bg-[#0f051d] border-purple-700/40 text-white placeholder-gray-400"
-          />
-
-          <div className="flex gap-3">
-            <button
-              onClick={generateRecommendation}
-              disabled={loading}
-              className="px-6 py-3 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold shadow hover:opacity-90 transition"
-            >
-              {loading ? "Calculating..." : "Generate Recommendation"}
-            </button>
+        {/* Budget Form Card */}
+        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 sm:p-8 space-y-5">
+          <div>
+            <h2 className="text-base font-bold text-slate-900">Configure Your Budget Target</h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Specify your account email and target monthly spending cap to generate an optimal distribution.
+            </p>
           </div>
 
-          {error && <div className="text-red-400 mt-2">{error}</div>}
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-700">Account Email</label>
+              <Input
+                type="email"
+                placeholder="your.email@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="h-10 text-sm bg-white border-slate-300 text-slate-900 focus:border-blue-500 rounded-xl"
+              />
+            </div>
 
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-700">Total Monthly Budget (₹)</label>
+              <Input
+                type="number"
+                placeholder="e.g., 25000"
+                value={budget}
+                onChange={(e) => setBudget(e.target.value)}
+                className="h-10 text-sm bg-white border-slate-300 text-slate-900 focus:border-blue-500 rounded-xl"
+              />
+            </div>
+
+            <Button
+              onClick={generateRecommendation}
+              disabled={loading}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold h-10 shadow-xs transition-colors flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Analyzing Historical Data...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  <span>Generate Allocation Recommendation</span>
+                </>
+              )}
+            </Button>
+          </div>
+
+          {error && (
+            <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs font-medium">
+              {error}
+            </div>
+          )}
+
+          {/* Recommendation Results */}
           {recommendation && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="mt-6"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="pt-6 border-t border-slate-100 space-y-4"
             >
-              <h2 className="text-xl font-semibold text-gray-200">
-                Recommended Monthly Limit:{" "}
-                <span className="text-purple-400">
-                  ₹{recommendation.monthlyLimit}
+              <div className="flex items-center justify-between p-4 rounded-xl bg-blue-50/70 border border-blue-200/80">
+                <span className="text-xs font-semibold text-slate-700">Recommended Monthly Ceiling:</span>
+                <span className="text-lg font-bold text-blue-700">
+                  ₹{Number(recommendation.monthlyLimit).toLocaleString("en-IN")}
                 </span>
-              </h2>
+              </div>
 
-              <ul className="mt-4 space-y-2">
-                {recommendation.suggestedCategories.map((item, index) => (
-                  <li
-                    key={index}
-                    className="flex justify-between bg-[#0f051d] p-3 rounded-md shadow border border-purple-800/30"
-                  >
-                    <span className="font-medium text-gray-300">
-                      {item.category}
-                    </span>
-                    <span className="text-gray-400">
-                      ₹{item.limit} ({item.percent}%)
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Recommended Category Distribution
+                </p>
+                <div className="space-y-2">
+                  {recommendation.suggestedCategories.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-slate-300 transition-colors"
+                    >
+                      <span className="text-xs font-semibold text-slate-900">
+                        {item.category}
+                      </span>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="font-bold text-slate-800">
+                          ₹{Number(item.limit).toLocaleString("en-IN")}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-700 font-semibold text-[10px]">
+                          {item.percent}%
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </motion.div>
           )}
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -12,6 +12,7 @@ import {
   ChevronRight,
   RefreshCw,
   Clock,
+  ArrowUpDown,
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -209,31 +210,27 @@ export function TransactionTable({ transactions }) {
   };
 
   return (
-    <div
-      className={cn(
-        "rounded-2xl border border-[#8884d8]/30 bg-gradient-to-br from-[#1a1a2e] to-[#111122] p-4 shadow transition-all duration-300 hover:bg-white/5 hover:shadow-lg"
-      )}
-    >
+    <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs transition-all">
       {deleteLoading && (
-        <BarLoader className="mt-2" width={"100%"} color="#8884d8" />
+        <BarLoader className="mb-4" width={"100%"} color="#2563eb" />
       )}
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-4">
+      {/* Filter & Search Bar */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-5">
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
           <Input
-            placeholder="Search transactions..."
+            placeholder="Search transactions by description..."
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="pl-8 bg-transparent border border-[#8884d8]/30 focus:border-[#8884d8] text-white"
+            className="pl-9 bg-slate-50 border-slate-200 focus:bg-white focus:border-blue-500 text-slate-900 placeholder:text-slate-400 rounded-xl text-sm"
           />
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Select
             value={typeFilter}
             onValueChange={(value) => {
@@ -241,12 +238,12 @@ export function TransactionTable({ transactions }) {
               setCurrentPage(1);
             }}
           >
-            <SelectTrigger className="w-[130px] border-[#8884d8]/30 bg-transparent text-white">
+            <SelectTrigger className="w-[125px] h-9 text-xs bg-slate-50 border-slate-200 text-slate-700 rounded-xl">
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="INCOME">Income</SelectItem>
-              <SelectItem value="EXPENSE">Expense</SelectItem>
+            <SelectContent className="bg-white border-slate-200 text-slate-800 rounded-xl">
+              <SelectItem value="INCOME" className="text-xs">Income</SelectItem>
+              <SelectItem value="EXPENSE" className="text-xs">Expense</SelectItem>
             </SelectContent>
           </Select>
 
@@ -257,15 +254,12 @@ export function TransactionTable({ transactions }) {
               setCurrentPage(1);
             }}
           >
-            <SelectTrigger className="w-[160px] border-[#8884d8]/30 bg-transparent text-white">
-              <SelectValue placeholder="All Transactions" />
+            <SelectTrigger className="w-[145px] h-9 text-xs bg-slate-50 border-slate-200 text-slate-700 rounded-xl">
+              <SelectValue placeholder="All Cadences" />
             </SelectTrigger>
-            <SelectContent
-              className="z-[9999] bg-white dark:bg-neutral-900 shadow-lg border border-neutral-200 dark:border-neutral-800 rounded-lg"
-              position="popper"
-              sideOffset={8}>
-              <SelectItem value="recurring">Recurring Only</SelectItem>
-              <SelectItem value="non-recurring">Non-recurring Only</SelectItem>
+            <SelectContent className="bg-white border-slate-200 text-slate-800 rounded-xl">
+              <SelectItem value="recurring" className="text-xs">Recurring Only</SelectItem>
+              <SelectItem value="non-recurring" className="text-xs">One-time Only</SelectItem>
             </SelectContent>
           </Select>
 
@@ -274,10 +268,10 @@ export function TransactionTable({ transactions }) {
               variant="destructive"
               size="sm"
               onClick={handleBulkDelete}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold h-9 gap-1.5"
             >
-              <Trash className="h-4 w-4 mr-2" />
-              Delete Selected ({selectedIds.length})
+              <Trash className="h-3.5 w-3.5" />
+              <span>Delete ({selectedIds.length})</span>
             </Button>
           )}
 
@@ -286,23 +280,23 @@ export function TransactionTable({ transactions }) {
               variant="outline"
               size="icon"
               onClick={handleClearFilters}
-              title="Clear filters"
-              className="border-[#8884d8]/30 text-[#8884d8] hover:bg-[#8884d8]/10"
+              title="Clear all filters"
+              className="h-9 w-9 border-slate-200 text-slate-600 hover:bg-slate-100 rounded-xl"
             >
-              <X className="h-4 w-5" />
+              <X className="h-4 w-4" />
             </Button>
           )}
         </div>
       </div>
 
       {/* Transactions Table */}
-      <div className="rounded-lg border border-[#8884d8]/20 overflow-hidden">
+      <div className="rounded-xl border border-slate-200/90 overflow-hidden">
         <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
-              <TableHead className="w-[50px]">
+          <TableHeader className="bg-slate-50/80">
+            <TableRow className="border-b border-slate-200 hover:bg-transparent">
+              <TableHead className="w-[44px]">
                 <Checkbox
-                  className="border border-white"
+                  className="border-slate-300"
                   checked={
                     selectedIds.length === paginatedTransactions.length &&
                     paginatedTransactions.length > 0
@@ -311,49 +305,62 @@ export function TransactionTable({ transactions }) {
                 />
               </TableHead>
               <TableHead
-                className="cursor-pointer  text-white"
+                className="cursor-pointer text-slate-700 font-semibold text-xs select-none"
                 onClick={() => handleSort("date")}
               >
-                <div className="flex items-center">
-                  Date
-                  {sortConfig.field === "date" &&
-                    (sortConfig.direction === "asc" ? (
-                      <ChevronUp className="ml-1 h-4 w-4" />
+                <div className="flex items-center gap-1">
+                  <span>Date</span>
+                  {sortConfig.field === "date" ? (
+                    sortConfig.direction === "asc" ? (
+                      <ChevronUp className="h-3.5 w-3.5 text-blue-600" />
                     ) : (
-                      <ChevronDown className="ml-1 h-4 w-4" />
-                    ))}
+                      <ChevronDown className="h-3.5 w-3.5 text-blue-600" />
+                    )
+                  ) : (
+                    <ArrowUpDown className="h-3 w-3 text-slate-400" />
+                  )}
                 </div>
               </TableHead>
-              <TableHead className="text-white">Description</TableHead>
+              <TableHead className="text-slate-700 font-semibold text-xs">
+                Description
+              </TableHead>
               <TableHead
-                className="cursor-pointer text-white"
+                className="cursor-pointer text-slate-700 font-semibold text-xs select-none"
                 onClick={() => handleSort("category")}
               >
-                <div className="flex items-center">
-                  Category
-                  {sortConfig.field === "category" &&
-                    (sortConfig.direction === "asc" ? (
-                      <ChevronUp className="ml-1 h-4 w-4" />
+                <div className="flex items-center gap-1">
+                  <span>Category</span>
+                  {sortConfig.field === "category" ? (
+                    sortConfig.direction === "asc" ? (
+                      <ChevronUp className="h-3.5 w-3.5 text-blue-600" />
                     ) : (
-                      <ChevronDown className="ml-1 h-4 w-4" />
-                    ))}
+                      <ChevronDown className="h-3.5 w-3.5 text-blue-600" />
+                    )
+                  ) : (
+                    <ArrowUpDown className="h-3 w-3 text-slate-400" />
+                  )}
                 </div>
               </TableHead>
               <TableHead
-                className="cursor-pointer text-right text-white"
+                className="cursor-pointer text-right text-slate-700 font-semibold text-xs select-none"
                 onClick={() => handleSort("amount")}
               >
-                <div className="flex items-center justify-end">
-                  Amount
-                  {sortConfig.field === "amount" &&
-                    (sortConfig.direction === "asc" ? (
-                      <ChevronUp className="ml-1 h-4 w-4" />
+                <div className="flex items-center justify-end gap-1">
+                  <span>Amount</span>
+                  {sortConfig.field === "amount" ? (
+                    sortConfig.direction === "asc" ? (
+                      <ChevronUp className="h-3.5 w-3.5 text-blue-600" />
                     ) : (
-                      <ChevronDown className="ml-1 h-4 w-4" />
-                    ))}
+                      <ChevronDown className="h-3.5 w-3.5 text-blue-600" />
+                    )
+                  ) : (
+                    <ArrowUpDown className="h-3 w-3 text-slate-400" />
+                  )}
                 </div>
               </TableHead>
-              <TableHead className="text-white">Recurring</TableHead>
+              <TableHead className="text-slate-700 font-semibold text-xs">
+                Cadence
+              </TableHead>
               <TableHead className="w-[50px]" />
             </TableRow>
           </TableHeader>
@@ -362,57 +369,51 @@ export function TransactionTable({ transactions }) {
               <TableRow>
                 <TableCell
                   colSpan={7}
-                  className="text-center text-muted-foreground"
+                  className="text-center py-12 text-slate-400"
                 >
-                  No transactions found
+                  No transactions match the selected criteria
                 </TableCell>
               </TableRow>
             ) : (
               paginatedTransactions.map((transaction) => (
                 <TableRow
                   key={transaction.id}
-                  className="hover:bg-white/5 transition-colors"
+                  className="hover:bg-slate-50/70 border-b border-slate-100 transition-colors"
                 >
                   <TableCell>
                     <Checkbox
-                      className="border border-white 
-    data-[state=checked]:bg-green-500 
-    data-[state=checked]:border-green-500 
-    data-[state=checked]:text-white
-  "
+                      className="border-slate-300"
                       checked={selectedIds.includes(transaction.id)}
                       onCheckedChange={() => handleSelect(transaction.id)}
-
-
                     />
                   </TableCell>
-                  <TableCell className="text-white">
+                  <TableCell className="text-slate-600 text-xs font-medium whitespace-nowrap">
                     {transaction.date && !isNaN(new Date(transaction.date).getTime())
-                      ? format(new Date(transaction.date), "PP")
+                      ? format(new Date(transaction.date), "MMM d, yyyy")
                       : "N/A"}
                   </TableCell>
-                  <TableCell className="text-white">
-                    {transaction.description}
+                  <TableCell className="text-slate-900 font-medium text-sm">
+                    {transaction.description || "Untitled Transaction"}
                   </TableCell>
                   <TableCell className="capitalize">
                     <span
                       style={{
-                        background: categoryColors[transaction.category],
+                        background: categoryColors[transaction.category] || "#64748B",
                       }}
-                      className="px-2 py-1 rounded text-white text-sm"
+                      className="px-2.5 py-0.5 rounded-full text-white text-[11px] font-semibold inline-block shadow-2xs"
                     >
                       {transaction.category}
                     </span>
                   </TableCell>
                   <TableCell
                     className={cn(
-                      "text-right font-medium whitespace-nowrap tabular-nums",
+                      "text-right font-bold whitespace-nowrap tabular-nums text-sm",
                       transaction.type === "EXPENSE"
-                        ? "text-red-400"
-                        : "text-green-400"
+                        ? "text-rose-600"
+                        : "text-emerald-600"
                     )}
                   >
-                    {transaction.type === "EXPENSE" ? "-" : "+"}₹{transaction.amount.toFixed(2)}
+                    {transaction.type === "EXPENSE" ? "-" : "+"}₹{transaction.amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </TableCell>
                   <TableCell>
                     {transaction.isRecurring ? (
@@ -421,30 +422,28 @@ export function TransactionTable({ transactions }) {
                           <TooltipTrigger>
                             <Badge
                               variant="secondary"
-                              className="gap-1 bg-purple-100 text-purple-700 hover:bg-purple-200"
+                              className="gap-1 bg-blue-50 text-blue-700 border-blue-200/60 text-[11px] font-medium"
                             >
                               <RefreshCw className="h-3 w-3" />
                               {
                                 RECURRING_INTERVALS[
-                                transaction.recurringInterval
-                                ]
+                                  transaction.recurringInterval
+                                ] || "Recurring"
                               }
                             </Badge>
                           </TooltipTrigger>
-                          <TooltipContent>
-                            <div className="text-sm">
-                              <div className="font-medium">Next Date:</div>
-                              <div>
-                                {transaction.nextRecurringDate && !isNaN(new Date(transaction.nextRecurringDate).getTime())
-                                  ? format(new Date(transaction.nextRecurringDate), "PPP")
-                                  : "N/A"}
-                              </div>
+                          <TooltipContent className="bg-slate-900 text-white rounded-lg">
+                            <div className="text-xs">
+                              <span className="text-slate-400">Next Scheduled:</span>{" "}
+                              {transaction.nextRecurringDate && !isNaN(new Date(transaction.nextRecurringDate).getTime())
+                                ? format(new Date(transaction.nextRecurringDate), "PP")
+                                : "N/A"}
                             </div>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     ) : (
-                      <Badge variant="outline" className="gap-1 text-white">
+                      <Badge variant="outline" className="gap-1 text-slate-500 border-slate-200 text-[11px] font-normal">
                         <Clock className="h-3 w-3" />
                         One-time
                       </Badge>
@@ -453,23 +452,24 @@ export function TransactionTable({ transactions }) {
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-purple-400">
-                          <MoreHorizontal className="h-4 w-4 text-white" />
+                        <Button variant="ghost" className="h-8 w-8 p-0 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg">
+                          <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent align="end" className="bg-white border-slate-200 text-slate-800 rounded-xl shadow-lg">
                         <DropdownMenuItem
                           onClick={() =>
                             router.push(
                               `/transaction/create?edit=${transaction.id}`
                             )
                           }
+                          className="text-xs cursor-pointer"
                         >
-                          Edit
+                          Edit Transaction
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          className="text-destructive"
+                          className="text-xs text-rose-600 cursor-pointer focus:text-rose-600 focus:bg-rose-50"
                           onClick={() => deleteFn([transaction.id])}
                         >
                           Delete
@@ -486,28 +486,33 @@ export function TransactionTable({ transactions }) {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-4">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="border-[#8884d8]/30 text-white bg-[#8884d8]/20 hover:bg-purple-400"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-sm text-white">
-            Page {currentPage} of {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="border-[#8884d8]/30 text-white bg-[#8884d8]/20 hover:bg-purple-400"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+        <div className="flex items-center justify-between mt-5 pt-3 border-t border-slate-100 text-xs text-slate-500">
+          <div>
+            Showing <strong className="text-slate-900">{((currentPage - 1) * ITEMS_PER_PAGE) + 1}</strong> to <strong className="text-slate-900">{Math.min(currentPage * ITEMS_PER_PAGE, filteredAndSortedTransactions.length)}</strong> of <strong className="text-slate-900">{filteredAndSortedTransactions.length}</strong> transactions
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="h-8 w-8 border-slate-200 text-slate-700 hover:bg-slate-100 rounded-lg"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="font-medium text-slate-700 px-2">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="h-8 w-8 border-slate-200 text-slate-700 hover:bg-slate-100 rounded-lg"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       )}
     </div>

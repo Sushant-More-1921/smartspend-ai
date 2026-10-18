@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 import { DashboardOverview } from "./_components/transaction-overview";
 import { GoalsDashboardCard } from "./_components/goals-dashboard-card";
+import { PageHeader } from "@/components/ui/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,13 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
+      {/* Page Header */}
+      <PageHeader
+        title="Dashboard"
+        subtitle="Manage accounts, track monthly spending, and monitor financial milestones."
+        badge={`${accounts.length} Active ${accounts.length === 1 ? "Account" : "Accounts"}`}
+      />
+
       {/* Financial Goals & Planner Card */}
       <GoalsDashboardCard />
 
@@ -27,30 +35,39 @@ export default async function DashboardPage() {
         currentExpenses={budgetData?.currentExpenses || 0}
       />
 
-      {/* Dashboard Overview */}
+      {/* Dashboard Overview: Charts & Recent Transactions */}
       <DashboardOverview
         accounts={accounts}
         transactions={transactions || []}
       />
 
-      {/* Accounts Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 ">
-        <CreateAccountDrawer>
-          <Card className="cursor-pointer relative 
-                   bg-[#1a1a1a]/80 border border-gray-500 shadow-lg rounded-2xl overflow-hidden transition-all duration-300 
-                   hover:shadow-[0_0_20px_rgba(168,85,247,0.6)] 
-                   hover:scale-[1.02] group">
-            <div className="rounded-2xl absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 pointer-events-none" />
-            <CardContent className="flex flex-col items-center justify-center text-muted-foreground h-full pt-5">
-              <Plus className="h-10 w-10 mb-2" />
-              <p className="text-sm font-medium">Add New Account</p>
-            </CardContent>
-          </Card>
-        </CreateAccountDrawer>
-        {accounts.length > 0 &&
-          accounts?.map((account) => (
-            <AccountCard key={account.id} account={account} />
-          ))}
+      {/* Accounts Ledger Section */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-lg font-bold text-slate-900">Connected Accounts</h2>
+            <p className="text-xs text-slate-500">Savings and checking accounts contributing to your balance</p>
+          </div>
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <CreateAccountDrawer>
+            <Card className="cursor-pointer border-2 border-dashed border-slate-300 hover:border-blue-500 bg-white hover:bg-blue-50/20 rounded-2xl shadow-xs transition-all duration-200 group flex items-center justify-center min-h-[180px]">
+              <CardContent className="flex flex-col items-center justify-center text-slate-500 group-hover:text-blue-600 p-6 text-center">
+                <div className="w-12 h-12 rounded-xl bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center mb-3 transition-colors">
+                  <Plus className="h-6 w-6 text-slate-600 group-hover:text-blue-600" />
+                </div>
+                <p className="text-sm font-semibold text-slate-900 group-hover:text-blue-600">Add New Account</p>
+                <p className="text-xs text-slate-400 mt-0.5">Connect a savings or current ledger</p>
+              </CardContent>
+            </Card>
+          </CreateAccountDrawer>
+
+          {accounts.length > 0 &&
+            accounts.map((account) => (
+              <AccountCard key={account.id} account={account} />
+            ))}
+        </div>
       </div>
     </div>
   );

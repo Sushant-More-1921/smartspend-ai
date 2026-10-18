@@ -44,37 +44,37 @@ export function DeleteAccountButton({ accountId, accountName, isDefault }) {
         <Button
           variant="outline"
           size="sm"
-          className="border-red-500/40 text-red-400 hover:bg-red-500/10 hover:border-red-500 hover:text-red-300 transition-all gap-1.5"
+          className="border-slate-300 text-slate-700 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition-all gap-1.5 rounded-xl text-xs font-semibold px-3 py-1.5 h-8 shadow-2xs"
         >
-          <Trash2 className="h-4 w-4" />
+          <Trash2 className="h-3.5 w-3.5" />
           <span>Delete Account</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-white border border-slate-200 text-slate-900 rounded-2xl shadow-xl">
         <DialogHeader>
-          <div className="flex items-center gap-2 text-red-400">
+          <div className="flex items-center gap-2 text-rose-600">
             <AlertTriangle className="h-5 w-5" />
-            <DialogTitle className="text-xl font-bold">Delete Account</DialogTitle>
+            <DialogTitle className="text-lg font-bold text-slate-900">Delete Account</DialogTitle>
           </div>
-          <DialogDescription className="text-gray-300 pt-2 text-sm leading-relaxed">
-            Are you sure you want to delete <span className="font-semibold text-white">&ldquo;{accountName}&rdquo;</span>?
-            All associated transactions will be permanently deleted. This action cannot be undone.
+          <DialogDescription className="text-slate-600 pt-2 text-sm leading-relaxed">
+            Are you sure you want to delete <span className="font-semibold text-slate-900">&ldquo;{accountName}&rdquo;</span>?
+            All associated transactions will be permanently removed. This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
 
         {isDefault && (
-          <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 text-xs">
-            ⚠️ This is currently your default account. If deleted, another account will automatically be designated as your default account.
+          <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs leading-relaxed">
+            ⚠️ This is currently your default account. If deleted, another account will automatically be designated as default.
           </div>
         )}
 
         <DialogFooter className="gap-2 sm:gap-0 mt-4">
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             onClick={() => setOpen(false)}
             disabled={loading}
-            className="text-gray-400 hover:text-white"
+            className="border-slate-300 text-slate-700 hover:bg-slate-100 rounded-xl"
           >
             Cancel
           </Button>
@@ -83,7 +83,7 @@ export function DeleteAccountButton({ accountId, accountName, isDefault }) {
             variant="destructive"
             onClick={handleDelete}
             disabled={loading}
-            className="bg-red-600 hover:bg-red-700 text-white gap-1.5"
+            className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl gap-1.5"
           >
             {loading ? (
               <>

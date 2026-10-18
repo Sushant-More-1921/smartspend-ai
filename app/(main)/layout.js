@@ -1,6 +1,6 @@
 export default function MainLayout({ children }) {
   return (
-    <div className="min-h-screen w-full bg-black"> 
+    <div className="min-h-screen w-full bg-slate-50 text-slate-900">
       {children}
     </div>
   );

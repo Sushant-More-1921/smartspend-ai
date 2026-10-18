@@ -1,31 +1,43 @@
 import React from "react";
 import HeroSection from "@/components/hero";
-import HowItWorks from "@/components/HowItWorks";
-import AnimatedStats from "@/components/AnimatedStats";
 import FeaturesSection from "@/components/FeaturesSection";
+import ProductPreview from "@/components/ProductPreview";
+import HowItWorks from "@/components/HowItWorks";
+import WhySmartSpend from "@/components/WhySmartSpend";
+import FinalCTA from "@/components/FinalCTA";
 import Footer from "@/components/Footer";
+
+export const metadata = {
+  title: "SmartSpend AI — Understand Your Money. Plan Your Future.",
+  description:
+    "SmartSpend AI helps you understand your spending habits, plan realistic savings goals, estimate how much you could potentially invest, and explore financial insights in one simple platform.",
+  icons: {
+    icon: "/logo-sm-white.png",
+  },
+};
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen bg-white ">
-      {/* Hero Section */}
+    <div className="min-h-screen bg-white">
+      {/* Section B: Hero Section */}
       <HeroSection />
-      {/* Main Content Section */}
-      <section className="relative py-10 text-white text-center 
-      bg-gradient-to-b from-black via-[#0f0a1f] to-black">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.25)_0%,transparent_70%)]"></div>
 
-        {/* Features Section */}
-        <FeaturesSection />
+      {/* Section C: Core Benefits */}
+      <FeaturesSection />
 
-        {/* Stats Section */}
-        <AnimatedStats />
+      {/* Section D: Product Preview */}
+      <ProductPreview />
 
-        {/* How It Works Section */}
-        <HowItWorks />
+      {/* Section E: How It Works */}
+      <HowItWorks />
 
-      </section>
-      {/* Footer Section */}
+      {/* Section F: Why SmartSpend AI? */}
+      <WhySmartSpend />
+
+      {/* Section G: Final Call to Action */}
+      <FinalCTA />
+
+      {/* Section H: Footer */}
       <Footer />
     </div>
   );

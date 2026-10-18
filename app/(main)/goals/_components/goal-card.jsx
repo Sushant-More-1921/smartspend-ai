@@ -28,7 +28,6 @@ import {
 import { getGoalIconComponent } from "@/lib/goal-icons";
 import { calculateRequiredMonthlyContribution } from "@/lib/financial-planner";
 
-
 export function GoalCard({
   goal,
   onAddMoney,
@@ -54,25 +53,23 @@ export function GoalCard({
 
   let statusBadge = {
     label: "In Progress",
-    className:
-      "border-purple-500/50 text-purple-300 bg-purple-950/40",
+    className: "border-blue-200 text-blue-700 bg-blue-50 font-semibold",
   };
 
   if (isCompleted) {
     statusBadge = {
       label: "Completed",
-      className:
-        "border-green-500/50 text-green-300 bg-green-950/40 font-semibold",
+      className: "border-emerald-200 text-emerald-700 bg-emerald-50 font-semibold",
     };
   } else if (isOverdue) {
     statusBadge = {
       label: "Overdue",
-      className: "border-red-500/50 text-red-300 bg-red-950/40 font-semibold",
+      className: "border-rose-200 text-rose-700 bg-rose-50 font-semibold",
     };
   } else if (savedAmount === 0) {
     statusBadge = {
       label: "Not Started",
-      className: "border-gray-500/50 text-gray-400 bg-gray-900/40",
+      className: "border-slate-200 text-slate-600 bg-slate-100",
     };
   }
 
@@ -85,40 +82,35 @@ export function GoalCard({
   });
 
   return (
-    <Card className="relative bg-[#1a0e30]/80 backdrop-blur-md border border-purple-500/30 rounded-2xl overflow-hidden hover:shadow-[0_0_25px_rgba(168,85,247,0.35)] transition-all duration-300 hover:scale-[1.01] group flex flex-col justify-between">
-      {/* Background glass shine */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-purple-500/5 pointer-events-none" />
-
-      <CardContent className="p-5 relative z-10 space-y-4 flex-1 flex flex-col justify-between">
+    <Card className="bg-white border border-slate-200/90 rounded-2xl shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-200 group flex flex-col justify-between overflow-hidden">
+      <CardContent className="p-5 space-y-4 flex-1 flex flex-col justify-between">
         {/* Top Header: Icon + Name + Category + Dropdown */}
         <div>
           <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 min-w-0">
               <div
-                className={`p-2.5 rounded-xl ${
+                className={`p-2.5 rounded-xl shrink-0 ${
                   isCompleted
-                    ? "bg-green-500/20 text-green-400 border border-green-500/40"
+                    ? "bg-emerald-50 text-emerald-600 border border-emerald-200/60"
                     : isOverdue
-                    ? "bg-red-500/20 text-red-400 border border-red-500/40"
-                    : "bg-purple-600/20 text-purple-300 border border-purple-500/40"
+                    ? "bg-rose-50 text-rose-600 border border-rose-200/60"
+                    : "bg-blue-50 text-blue-600 border border-blue-200/60"
                 }`}
               >
-                {React.createElement(getGoalIconComponent(goal.icon), {
-                  className: "w-6 h-6",
-                })}
+                {React.createElement(getGoalIconComponent(goal.icon), { className: "w-5 h-5" })}
               </div>
-              <div>
-                <h3 className="text-base font-bold text-white group-hover:text-purple-300 transition-colors">
+              <div className="min-w-0">
+                <h3 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
                   {goal.name}
                 </h3>
-                <span className="text-[11px] text-gray-400 font-medium">
+                <span className="text-[11px] text-slate-500 font-medium">
                   {goal.category}
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5">
-              <Badge variant="outline" className={statusBadge.className}>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Badge variant="outline" className={`text-xs px-2 py-0.5 rounded-full ${statusBadge.className}`}>
                 {statusBadge.label}
               </Badge>
 
@@ -127,62 +119,62 @@ export function GoalCard({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-gray-400 hover:text-white hover:bg-purple-900/40 rounded-full"
+                    className="h-8 w-8 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg"
                   >
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="bg-[#180a2e] border-purple-800/40 text-gray-200 rounded-xl w-48 shadow-2xl"
+                  className="bg-white border-slate-200 text-slate-800 rounded-xl w-48 shadow-lg"
                 >
                   <DropdownMenuItem
                     onClick={() => onAddMoney(goal)}
-                    className="hover:bg-purple-900/40 hover:text-white cursor-pointer"
+                    className="cursor-pointer text-xs"
                   >
-                    <PlusCircle className="mr-2 h-4 w-4 text-purple-400" />
+                    <PlusCircle className="mr-2 h-4 w-4 text-blue-600" />
                     Add Money
                   </DropdownMenuItem>
 
                   <DropdownMenuItem
                     onClick={() => onOpenPlanner(goal)}
-                    className="hover:bg-purple-900/40 hover:text-white cursor-pointer"
+                    className="cursor-pointer text-xs"
                   >
-                    <Calculator className="mr-2 h-4 w-4 text-indigo-400" />
+                    <Calculator className="mr-2 h-4 w-4 text-indigo-600" />
                     Plan & Simulate
                   </DropdownMenuItem>
 
                   <DropdownMenuItem
                     onClick={() => onEdit(goal)}
-                    className="hover:bg-purple-900/40 hover:text-white cursor-pointer"
+                    className="cursor-pointer text-xs"
                   >
-                    <Edit className="mr-2 h-4 w-4 text-blue-400" />
+                    <Edit className="mr-2 h-4 w-4 text-slate-600" />
                     Edit Goal
                   </DropdownMenuItem>
 
                   <DropdownMenuItem
                     onClick={() => onViewHistory(goal)}
-                    className="hover:bg-purple-900/40 hover:text-white cursor-pointer"
+                    className="cursor-pointer text-xs"
                   >
-                    <History className="mr-2 h-4 w-4 text-pink-400" />
+                    <History className="mr-2 h-4 w-4 text-slate-600" />
                     View History
                   </DropdownMenuItem>
 
                   {savedAmount > 0 && (
                     <DropdownMenuItem
                       onClick={() => onWithdraw(goal)}
-                      className="hover:bg-purple-900/40 hover:text-amber-300 cursor-pointer"
+                      className="cursor-pointer text-xs text-amber-700"
                     >
-                      <ArrowDownLeft className="mr-2 h-4 w-4 text-amber-400" />
+                      <ArrowDownLeft className="mr-2 h-4 w-4 text-amber-600" />
                       Release Funds
                     </DropdownMenuItem>
                   )}
 
-                  <DropdownMenuSeparator className="bg-purple-800/40" />
+                  <DropdownMenuSeparator className="bg-slate-100" />
 
                   <DropdownMenuItem
                     onClick={() => onDelete(goal)}
-                    className="hover:bg-red-950/50 hover:text-red-300 text-red-400 cursor-pointer"
+                    className="cursor-pointer text-xs text-rose-600 focus:text-rose-600 focus:bg-rose-50"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Delete Goal
@@ -193,7 +185,7 @@ export function GoalCard({
           </div>
 
           {goal.description && (
-            <p className="text-xs text-gray-400 mt-2 line-clamp-2 italic">
+            <p className="text-xs text-slate-500 mt-2 line-clamp-2 italic">
               &ldquo;{goal.description}&rdquo;
             </p>
           )}
@@ -203,70 +195,69 @@ export function GoalCard({
         <div className="space-y-3 pt-2">
           <div className="flex items-baseline justify-between">
             <div>
-              <span className="text-[11px] text-gray-400">Current Saved</span>
-              <div className="text-2xl font-black bg-gradient-to-r from-purple-300 via-pink-300 to-indigo-300 bg-clip-text text-transparent">
-                ₹{savedAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+              <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Allocated</span>
+              <div className="text-2xl font-extrabold text-slate-900 tracking-tight">
+                ₹{savedAmount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
             <div className="text-right">
-              <span className="text-[11px] text-gray-400">Target</span>
-              <div className="text-sm font-semibold text-gray-200">
-                ₹{targetAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+              <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Target</span>
+              <div className="text-sm font-bold text-slate-700">
+                ₹{targetAmount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
           </div>
 
           {/* Progress Bar with Color states */}
           <div className="space-y-1">
-            <div className="flex justify-between text-xs text-gray-300">
-              <span className="font-semibold text-purple-300">
+            <div className="flex justify-between text-xs text-slate-600">
+              <span className="font-bold text-blue-600">
                 {rawProgress.toFixed(1)}%
               </span>
-              <span className="text-gray-400">
+              <span className="text-slate-500">
                 {isCompleted ? (
-                  <span className="text-green-400 font-medium">Goal Achieved!</span>
+                  <span className="text-emerald-600 font-semibold">Goal Achieved!</span>
                 ) : (
                   `₹${remainingAmount.toLocaleString("en-IN", {
                     minimumFractionDigits: 2,
-                  })} remaining`
+                    maximumFractionDigits: 2,
+                  })} needed`
                 )}
               </span>
             </div>
             <Progress
               value={displayProgress}
-              className="h-2.5 bg-gray-900/60 rounded-full"
+              className="h-2 bg-slate-100 rounded-full"
               extraStyles={
                 isCompleted
-                  ? "bg-green-500"
+                  ? "bg-emerald-500"
                   : isOverdue
-                  ? "bg-red-500"
-                  : rawProgress >= 75
-                  ? "bg-gradient-to-r from-purple-500 to-pink-500"
-                  : "bg-purple-600"
+                  ? "bg-rose-500"
+                  : "bg-blue-600"
               }
             />
           </div>
         </div>
 
         {/* Target Date, Time Remaining, and Required Monthly Contribution */}
-        <div className="space-y-2 pt-2 border-t border-purple-800/30 text-xs">
-          <div className="flex items-center justify-between text-gray-300">
-            <div className="flex items-center gap-1.5 text-gray-400">
-              <Calendar className="w-3.5 h-3.5 text-purple-400" />
+        <div className="space-y-2 pt-3 border-t border-slate-100 text-xs">
+          <div className="flex items-center justify-between text-slate-600">
+            <div className="flex items-center gap-1.5 text-slate-500">
+              <Calendar className="w-3.5 h-3.5 text-slate-400" />
               <span>
                 {targetDate ? format(targetDate, "dd MMM yyyy") : "No deadline"}
               </span>
             </div>
             {targetDate && (
               <div className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-pink-400" />
+                <Clock className="w-3.5 h-3.5 text-slate-400" />
                 <span
                   className={
                     isOverdue
-                      ? "text-red-400 font-semibold"
+                      ? "text-rose-600 font-semibold"
                       : isCompleted
-                      ? "text-green-400 font-medium"
-                      : "text-gray-300"
+                      ? "text-emerald-600 font-medium"
+                      : "text-slate-600 font-medium"
                   }
                 >
                   {monthlyCalc?.timeText || "N/A"}
@@ -277,15 +268,16 @@ export function GoalCard({
 
           {/* Required Monthly Contribution Pill */}
           {!isCompleted && targetDate && monthlyCalc?.requiredMonthly !== null && (
-            <div className="p-2 rounded-xl bg-purple-950/40 border border-purple-800/40 flex items-center justify-between">
-              <span className="text-[11px] text-gray-400">
+            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+              <span className="text-[11px] text-slate-500">
                 Required Monthly:
               </span>
-              <span className="font-bold text-amber-300">
+              <span className="font-bold text-slate-900">
                 ₹{monthlyCalc.requiredMonthly.toLocaleString("en-IN", {
                   minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
                 })}
-                <span className="text-[10px] text-gray-400 font-normal">
+                <span className="text-[10px] text-slate-400 font-normal">
                   /mo
                 </span>
               </span>
@@ -293,29 +285,29 @@ export function GoalCard({
           )}
 
           {isCompleted && (
-            <div className="p-2 rounded-xl bg-green-950/30 border border-green-800/40 flex items-center justify-center gap-1.5 text-green-300 text-xs font-semibold">
-              <CheckCircle2 className="w-4 h-4 text-green-400" />
+            <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-center gap-1.5 text-emerald-800 text-xs font-semibold">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               Target fully funded!
             </div>
           )}
         </div>
 
         {/* Card Actions Button Row */}
-        <div className="grid grid-cols-2 gap-2 pt-3">
+        <div className="grid grid-cols-2 gap-2 pt-2">
           <Button
             onClick={() => onAddMoney(goal)}
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl text-xs font-semibold py-1.5 h-9 shadow-md flex items-center justify-center gap-1.5"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold py-2 h-9 shadow-xs flex items-center justify-center gap-1.5 transition-colors"
           >
-            <PlusCircle className="w-4 h-4" />
+            <PlusCircle className="w-3.5 h-3.5" />
             Add Money
           </Button>
 
           <Button
             variant="outline"
             onClick={() => onOpenPlanner(goal)}
-            className="w-full border-purple-500/40 text-purple-200 hover:text-white hover:bg-purple-900/30 rounded-xl text-xs font-semibold py-1.5 h-9 flex items-center justify-center gap-1.5"
+            className="w-full border-slate-300 text-slate-700 hover:bg-slate-100 rounded-xl text-xs font-semibold py-2 h-9 flex items-center justify-center gap-1.5 transition-colors"
           >
-            <Calculator className="w-4 h-4" />
+            <Calculator className="w-3.5 h-3.5 text-slate-500" />
             Plan & What-If
           </Button>
         </div>

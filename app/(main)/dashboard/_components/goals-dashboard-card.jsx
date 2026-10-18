@@ -32,20 +32,17 @@ export async function GoalsDashboardCard() {
     .slice(0, 2);
 
   return (
-    <Card className="relative bg-gradient-to-br from-[#1c0c38] via-[#160a2c] to-[#0f051d] border border-purple-500/40 rounded-2xl overflow-hidden shadow-xl hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all duration-300">
-      {/* Background glass shine */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-pink-500/5 pointer-events-none" />
-
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-purple-600/20 border border-purple-500/40 text-purple-400">
-            <Target className="w-5 h-5" />
+    <Card className="bg-white border border-slate-200/90 rounded-2xl shadow-xs p-2">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200/60 text-blue-600 flex items-center justify-center shrink-0">
+            <Target className="w-4 h-4" />
           </div>
           <div>
-            <CardTitle className="text-base font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <CardTitle className="text-base font-bold text-slate-900">
               Financial Goals & Planner
             </CardTitle>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-slate-500">
               {activeGoalsCount} active • {completedGoalsCount} completed
             </p>
           </div>
@@ -54,7 +51,8 @@ export async function GoalsDashboardCard() {
         <Link href="/goals" prefetch={true}>
           <Button
             size="sm"
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-full text-xs font-semibold px-3.5 py-1.5 h-8 shadow-md flex items-center gap-1.5 hover:scale-105 transition-all"
+            variant="outline"
+            className="border-slate-300 text-slate-700 hover:bg-slate-100 rounded-xl text-xs font-semibold px-3 py-1.5 h-8 flex items-center gap-1.5 transition-colors"
           >
             <span>Manage Goals</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -62,18 +60,17 @@ export async function GoalsDashboardCard() {
         </Link>
       </CardHeader>
 
-      <CardContent className="space-y-4 relative z-10 pt-1">
+      <CardContent className="space-y-4 pt-1">
         {goals.length === 0 ? (
-          <div className="p-4 rounded-xl bg-purple-950/20 border border-purple-800/30 text-center space-y-2">
-            <p className="text-xs text-gray-300">
-              No financial goals created yet. Set targets for emergencies, gadgets, or
-              savings to track progress and get monthly required plans.
+          <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 text-center space-y-2">
+            <p className="text-xs text-slate-600">
+              No financial goals created yet. Set targets for emergencies, education, or
+              investments to track progress and get required monthly savings plans.
             </p>
             <Link href="/goals" className="inline-block pt-1">
               <Button
                 size="sm"
-                variant="outline"
-                className="border-purple-500/40 text-purple-300 hover:text-white hover:bg-purple-900/30 text-xs rounded-xl"
+                className="bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-xl"
               >
                 <PlusCircle className="w-3.5 h-3.5 mr-1.5" />
                 Create Your First Goal
@@ -85,27 +82,27 @@ export async function GoalsDashboardCard() {
             {/* Overall Progress */}
             <div className="space-y-1.5">
               <div className="flex justify-between items-baseline text-xs">
-                <span className="text-gray-300">
+                <span className="text-slate-600">
                   Total Saved:{" "}
-                  <strong className="text-purple-300 font-bold">
+                  <strong className="text-slate-900 font-bold">
                     ₹{totalSaved.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                   </strong>{" "}
                   of ₹{totalGoalTarget.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                 </span>
-                <span className="font-bold text-pink-300">
+                <span className="font-bold text-blue-600">
                   {totalProgress.toFixed(1)}%
                 </span>
               </div>
               <Progress
                 value={displayProgress}
-                className="h-2.5 bg-gray-900/60 rounded-full"
-                extraStyles="bg-gradient-to-r from-purple-500 to-pink-500"
+                className="h-2.5 bg-slate-100 rounded-full"
+                extraStyles="bg-blue-600"
               />
             </div>
 
             {/* Quick Preview of Top 2 Active Goals */}
             {topActiveGoals.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                 {topActiveGoals.map((goal) => {
                   const Icon = getGoalIconComponent(goal.icon);
                   const goalProg =
@@ -116,17 +113,17 @@ export async function GoalsDashboardCard() {
                   return (
                     <div
                       key={goal.id}
-                      className="p-3 rounded-xl bg-black/40 border border-purple-800/30 hover:border-purple-600/40 transition-colors flex items-center justify-between gap-3 text-xs"
+                      className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 hover:border-slate-300 transition-colors flex items-center justify-between gap-3 text-xs"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="p-1.5 rounded-lg bg-purple-900/30 text-purple-400 shrink-0">
-                          <Icon className="w-4 h-4" />
+                        <div className="p-2 rounded-lg bg-white border border-slate-200 text-slate-700 shrink-0 shadow-2xs">
+                          <Icon className="w-4 h-4 text-blue-600" />
                         </div>
                         <div className="truncate">
-                          <p className="font-semibold text-white truncate">
+                          <p className="font-semibold text-slate-900 truncate">
                             {goal.name}
                           </p>
-                          <p className="text-[11px] text-gray-400">
+                          <p className="text-[11px] text-slate-500">
                             ₹{Number(goal.savedAmount).toLocaleString("en-IN")} / ₹
                             {Number(goal.targetAmount).toLocaleString("en-IN")}
                           </p>
@@ -134,7 +131,7 @@ export async function GoalsDashboardCard() {
                       </div>
 
                       <div className="text-right shrink-0">
-                        <span className="font-bold text-purple-300">
+                        <span className="font-bold text-blue-600">
                           {goalProg.toFixed(0)}%
                         </span>
                       </div>

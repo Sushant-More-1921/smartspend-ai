@@ -53,8 +53,8 @@ function GoalHistoryContent({ goal }) {
 
   if (loading) {
     return (
-      <div className="py-12 flex flex-col items-center justify-center text-gray-400 space-y-2">
-        <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
+      <div className="py-12 flex flex-col items-center justify-center text-slate-400 space-y-2">
+        <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
         <p className="text-xs">Loading transaction history...</p>
       </div>
     );
@@ -62,7 +62,7 @@ function GoalHistoryContent({ goal }) {
 
   if (error) {
     return (
-      <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-300">
+      <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700">
         {error}
       </div>
     );
@@ -70,7 +70,7 @@ function GoalHistoryContent({ goal }) {
 
   if (history.length === 0) {
     return (
-      <div className="py-12 text-center text-gray-400 text-xs">
+      <div className="py-12 text-center text-slate-400 text-xs">
         No contribution records found for this goal yet.
       </div>
     );
@@ -90,15 +90,15 @@ function GoalHistoryContent({ goal }) {
         return (
           <div
             key={item.id}
-            className="p-3.5 rounded-xl bg-[#0e051c] border border-purple-800/30 hover:border-purple-600/40 transition-colors space-y-2"
+            className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-slate-300 transition-colors space-y-2"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div
                   className={`p-1.5 rounded-lg ${
                     isRefund
-                      ? "bg-amber-500/20 text-amber-400"
-                      : "bg-emerald-500/20 text-emerald-400"
+                      ? "bg-amber-100 text-amber-700"
+                      : "bg-emerald-100 text-emerald-700"
                   }`}
                 >
                   {isRefund ? (
@@ -112,8 +112,8 @@ function GoalHistoryContent({ goal }) {
                     variant="outline"
                     className={
                       isRefund
-                        ? "border-amber-500/50 text-amber-300 bg-amber-950/30 text-[10px]"
-                        : "border-emerald-500/50 text-emerald-300 bg-emerald-950/30 text-[10px]"
+                        ? "border-amber-200 text-amber-700 bg-amber-50 text-[10px]"
+                        : "border-emerald-200 text-emerald-700 bg-emerald-50 text-[10px]"
                     }
                   >
                     {isRefund ? "Funds Released" : "Contribution"}
@@ -122,7 +122,7 @@ function GoalHistoryContent({ goal }) {
               </div>
               <div
                 className={`text-base font-bold ${
-                  isRefund ? "text-amber-400" : "text-emerald-400"
+                  isRefund ? "text-amber-700" : "text-emerald-700"
                 }`}
               >
                 {isRefund ? "-" : "+"}₹{amountNum.toLocaleString("en-IN", {
@@ -131,14 +131,14 @@ function GoalHistoryContent({ goal }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-[11px] text-gray-400 pt-1 border-t border-purple-950">
+            <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-500 pt-1 border-t border-slate-200/60">
               <div className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-purple-400" />
+                <Calendar className="w-3.5 h-3.5 text-slate-400" />
                 <span>{dateStr}</span>
               </div>
               {item.sourceAccount && (
                 <div className="flex items-center gap-1.5 justify-end">
-                  <Wallet className="w-3.5 h-3.5 text-pink-400" />
+                  <Wallet className="w-3.5 h-3.5 text-slate-400" />
                   <span className="truncate">
                     {item.sourceAccount.name}
                   </span>
@@ -147,14 +147,14 @@ function GoalHistoryContent({ goal }) {
             </div>
 
             {item.note && (
-              <div className="flex items-start gap-1.5 text-xs text-gray-300 bg-purple-950/20 p-2 rounded-lg">
-                <FileText className="w-3.5 h-3.5 text-purple-400 mt-0.5 shrink-0" />
+              <div className="flex items-start gap-1.5 text-xs text-slate-600 bg-white border border-slate-200 p-2 rounded-lg">
+                <FileText className="w-3.5 h-3.5 text-slate-400 mt-0.5 shrink-0" />
                 <span className="italic">&ldquo;{item.note}&rdquo;</span>
               </div>
             )}
 
             {item.reference && (
-              <div className="flex items-center justify-between text-[10px] text-gray-500 font-mono">
+              <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono">
                 <span>Ref:</span>
                 <span>{item.reference}</span>
               </div>
@@ -171,13 +171,15 @@ export function GoalHistoryDialog({ isOpen, onClose, goal }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[85vh] overflow-hidden flex flex-col bg-[#160b28] border-purple-500/40 text-white rounded-2xl">
+      <DialogContent className="max-w-lg max-h-[85vh] overflow-hidden flex flex-col bg-white border border-slate-200 text-slate-900 rounded-2xl p-6 shadow-xl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center gap-2">
-            <History className="w-5 h-5 text-purple-400" />
+          <DialogTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+              <History className="w-4 h-4" />
+            </div>
             Contribution History: {goal.name}
           </DialogTitle>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-slate-500">
             Audit log of all funds allocated or released for this goal.
           </p>
         </DialogHeader>

@@ -11,6 +11,7 @@ export async function getCurrentBudget(accountId) {
 
     const user = await db.user.findUnique({
       where: { clerkUserId: userId },
+      select: { id: true },
     });
 
     if (!user) {
@@ -87,6 +88,7 @@ export async function updateBudget(amount) {
 
     const user = await db.user.findUnique({
       where: { clerkUserId: userId },
+      select: { id: true },
     });
 
     if (!user) throw new Error("User not found");

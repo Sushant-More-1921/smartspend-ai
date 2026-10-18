@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Camera, Loader2 } from "lucide-react";
+import { Camera, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { scanReceipt } from "@/actions/transaction";
@@ -58,19 +58,20 @@ export function ReceiptScanner({ onScanComplete }) {
       <Button
         type="button"
         variant="outline"
-        className="w-full h-10 bg-gradient-to-br from-orange-500 via-pink-500 to-purple-500 animate-gradient hover:opacity-90 transition-opacity text-white hover:text-white"
+        className="w-full h-11 bg-blue-50/80 hover:bg-blue-100 border border-blue-200 text-blue-700 font-semibold text-xs rounded-xl transition-colors flex items-center justify-center gap-2 shadow-2xs"
         onClick={() => fileInputRef.current?.click()}
         disabled={loading}
       >
         {loading ? (
           <>
-            <Loader2 className="mr-2 animate-spin h-4 w-4" />
+            <Loader2 className="animate-spin h-4 w-4" />
             <span>Scanning Receipt with AI...</span>
           </>
         ) : (
           <>
-            <Camera className="mr-2 h-4 w-4" />
-            <span>Scan Receipt with AI</span>
+            <Sparkles className="h-4 w-4 text-blue-600" />
+            <Camera className="h-4 w-4 text-blue-600" />
+            <span>Scan Receipt with AI (Auto-Fill)</span>
           </>
         )}
       </Button>

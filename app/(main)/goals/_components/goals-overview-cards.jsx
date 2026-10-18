@@ -29,14 +29,12 @@ export function GoalsOverviewCards({ overview }) {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`,
-      subtext: `For ${activeGoalsCount} active goal${
+      subtext: `Across ${activeGoalsCount} active goal${
         activeGoalsCount === 1 ? "" : "s"
       }`,
       icon: Target,
-      gradient: "from-purple-500/20 via-indigo-500/10 to-transparent",
-      borderColor: "border-purple-500/40",
-      iconColor: "text-purple-400",
-      valueColor: "bg-gradient-to-r from-purple-300 to-indigo-300",
+      iconColor: "text-blue-600",
+      iconBg: "bg-blue-50 border border-blue-200/60",
     },
     {
       title: "Total Saved",
@@ -44,95 +42,81 @@ export function GoalsOverviewCards({ overview }) {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`,
-      subtext: "Allocated across all goals",
+      subtext: "Allocated toward goals",
       icon: PiggyBank,
-      gradient: "from-pink-500/20 via-purple-500/10 to-transparent",
-      borderColor: "border-pink-500/40",
-      iconColor: "text-pink-400",
-      valueColor: "bg-gradient-to-r from-pink-400 to-purple-400",
+      iconColor: "text-emerald-600",
+      iconBg: "bg-emerald-50 border border-emerald-200/60",
     },
     {
-      title: "Remaining Amount",
+      title: "Remaining Needed",
       value: `₹${totalRemainingAmount.toLocaleString("en-IN", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`,
-      subtext: "Needed to achieve targets",
+      subtext: "To fully fund all targets",
       icon: Hourglass,
-      gradient: "from-amber-500/20 via-orange-500/10 to-transparent",
-      borderColor: "border-amber-500/40",
-      iconColor: "text-amber-400",
-      valueColor: "bg-gradient-to-r from-amber-300 to-orange-300",
+      iconColor: "text-amber-600",
+      iconBg: "bg-amber-50 border border-amber-200/60",
     },
     {
-      title: "Available Balance",
+      title: "Account Liquidity",
       value: `₹${availableBalance.toLocaleString("en-IN", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`,
-      subtext: "Total in bank accounts",
+      subtext: "Total balance across accounts",
       icon: Wallet,
-      gradient: "from-emerald-500/20 via-teal-500/10 to-transparent",
-      borderColor: "border-emerald-500/40",
-      iconColor: "text-emerald-400",
-      valueColor: "bg-gradient-to-r from-emerald-300 to-teal-300",
+      iconColor: "text-indigo-600",
+      iconBg: "bg-indigo-50 border border-indigo-200/60",
     },
     {
       title: "Active Goals",
       value: activeGoalsCount.toString(),
       subtext:
         totalGoalsCount > 0
-          ? `${Math.round((activeGoalsCount / totalGoalsCount) * 100)}% of total goals`
-          : "None created yet",
+          ? `${Math.round((activeGoalsCount / totalGoalsCount) * 100)}% of total targets`
+          : "None currently active",
       icon: TrendingUp,
-      gradient: "from-blue-500/20 via-cyan-500/10 to-transparent",
-      borderColor: "border-blue-500/40",
-      iconColor: "text-blue-400",
-      valueColor: "bg-gradient-to-r from-blue-300 to-cyan-300",
+      iconColor: "text-sky-600",
+      iconBg: "bg-sky-50 border border-sky-200/60",
     },
     {
       title: "Completed Goals",
       value: completedGoalsCount.toString(),
       subtext:
         completedGoalsCount > 0
-          ? "Target successfully met!"
-          : "Keep going to finish your first",
+          ? "Target successfully met"
+          : "Keep allocating to finish your first",
       icon: CheckCircle2,
-      gradient: "from-green-500/20 via-emerald-500/10 to-transparent",
-      borderColor: "border-green-500/40",
-      iconColor: "text-green-400",
-      valueColor: "bg-gradient-to-r from-green-300 to-emerald-300",
+      iconColor: "text-teal-600",
+      iconBg: "bg-teal-50 border border-teal-200/60",
     },
   ];
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-      {cards.map((card, idx) => {
-        const IconComponent = card.icon;
+      {cards.map((card, i) => {
+        const Icon = card.icon;
         return (
           <Card
-            key={idx}
-            className={`relative bg-[#160a2c]/80 backdrop-blur-md border ${card.borderColor} rounded-2xl overflow-hidden hover:shadow-[0_0_20px_rgba(168,85,247,0.35)] transition-all duration-300 hover:scale-[1.02]`}
+            key={i}
+            className="bg-white border border-slate-200/90 rounded-2xl shadow-xs hover:border-slate-300 hover:shadow-sm transition-all"
           >
-            <div
-              className={`absolute inset-0 bg-gradient-to-br ${card.gradient} pointer-events-none`}
-            />
-            <CardContent className="p-4 relative z-10 flex flex-col justify-between h-full">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-gray-300">
+            <CardContent className="p-4 flex flex-col justify-between h-full">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                   {card.title}
                 </span>
-                <div className={`p-1.5 rounded-lg bg-black/40 ${card.iconColor}`}>
-                  <IconComponent className="w-4 h-4" />
+                <div className={`p-1.5 rounded-lg ${card.iconBg}`}>
+                  <Icon className={`w-3.5 h-3.5 ${card.iconColor}`} />
                 </div>
               </div>
+
               <div>
-                <div
-                  className={`text-xl font-extrabold bg-clip-text text-transparent ${card.valueColor} tracking-tight`}
-                >
+                <p className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 truncate">
                   {card.value}
-                </div>
-                <p className="text-[11px] text-gray-400 mt-1 line-clamp-1">
+                </p>
+                <p className="text-[11px] text-slate-500 mt-0.5 truncate">
                   {card.subtext}
                 </p>
               </div>

@@ -10,7 +10,7 @@ import {
   Legend,
 } from "recharts";
 import { format, subDays, startOfDay } from "date-fns";
-import { ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Receipt } from "lucide-react";
 
 import {
   Select,
@@ -23,15 +23,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
+// Clean, curated pastel fintech chart palette
 const COLORS = [
-  "#A855F7",
-  "#EC4899",
-  "#3B82F6",
-  "#10B981",
-  "#F59E0B",
-  "#6366F1",
-  "#14B8A6",
-  "#F43F5E",
+  "#2563EB", // Blue
+  "#059669", // Emerald
+  "#7C3AED", // Violet
+  "#D97706", // Amber
+  "#0284C7", // Sky
+  "#E11D48", // Rose
+  "#0D9488", // Teal
+  "#4F46E5", // Indigo
 ];
 
 const TIME_RANGES = {
@@ -131,58 +132,63 @@ export function DashboardOverview({ accounts = [], transactions = [] }) {
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {/* Recent Transactions */}
-      <Card className="relative bg-[#1a1a1a]/80 border border-gray-700 shadow-xl rounded-2xl overflow-hidden transition-all duration-300">
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 via-transparent to-white/5 pointer-events-none" />
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
-          <CardTitle className="text-base font-semibold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-            Recent Transactions
-          </CardTitle>
+      <Card className="bg-white border border-slate-200/90 shadow-xs rounded-2xl overflow-hidden">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b border-slate-100">
+          <div>
+            <CardTitle className="text-base font-bold text-slate-900">
+              Recent Transactions
+            </CardTitle>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Latest recorded account activity
+            </p>
+          </div>
           <Select
             value={selectedAccountId}
             onValueChange={setSelectedAccountId}
           >
-            <SelectTrigger className="w-[150px] bg-transparent border border-gray-600 text-white">
+            <SelectTrigger className="w-[140px] h-8 text-xs bg-slate-50 border-slate-200 text-slate-700 rounded-lg">
               <SelectValue placeholder="All Accounts" />
             </SelectTrigger>
-            <SelectContent className="bg-[#1a1a1a] border border-gray-700 text-gray-200">
-              <SelectItem value="ALL">All Accounts</SelectItem>
+            <SelectContent className="bg-white border-slate-200 text-slate-800 rounded-xl">
+              <SelectItem value="ALL" className="text-xs">All Accounts</SelectItem>
               {accounts.map((account) => (
-                <SelectItem key={account.id} value={account.id}>
+                <SelectItem key={account.id} value={account.id} className="text-xs">
                   {account.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </CardHeader>
-        <CardContent className="relative z-10">
-          <div className="space-y-4">
+        <CardContent className="pt-4">
+          <div className="space-y-3">
             {recentTransactions.length === 0 ? (
-              <p className="text-center text-muted-foreground py-6">
-                No recent transactions found
-              </p>
+              <div className="text-center py-10 text-slate-400">
+                <Receipt className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No recent transactions found</p>
+              </div>
             ) : (
               recentTransactions.map((transaction) => (
                 <div
                   key={transaction.id}
-                  className="flex items-center justify-between gap-4 border-b border-gray-800/80 pb-3 last:border-none"
+                  className="flex items-center justify-between gap-4 p-2.5 rounded-xl hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-none"
                 >
                   <div className="space-y-1 min-w-0 flex-1">
                     <p
-                      className="text-sm font-medium leading-snug text-white truncate"
+                      className="text-sm font-semibold leading-snug text-slate-900 truncate"
                       title={transaction.description || "Untitled Transaction"}
                     >
                       {transaction.description || "Untitled Transaction"}
                     </p>
                     <div className="flex items-center gap-2">
-                      <p className="text-xs text-gray-400 shrink-0">
+                      <p className="text-xs text-slate-500 shrink-0">
                         {transaction.date && !isNaN(new Date(transaction.date).getTime())
-                          ? format(new Date(transaction.date), "PP")
+                          ? format(new Date(transaction.date), "MMM d, yyyy")
                           : "N/A"}
                       </p>
                       {transaction.category && (
                         <Badge
-                          variant="outline"
-                          className="text-[10px] py-0 px-1.5 h-4 text-purple-300 border-purple-500/30 bg-purple-950/20 shrink-0"
+                          variant="secondary"
+                          className="text-[10px] py-0 px-2 h-4 text-slate-600 bg-slate-100 border-slate-200/60 font-medium shrink-0"
                         >
                           {transaction.category}
                         </Badge>
@@ -191,19 +197,19 @@ export function DashboardOverview({ accounts = [], transactions = [] }) {
                   </div>
                   <div
                     className={cn(
-                      "flex items-center text-sm font-semibold shrink-0 whitespace-nowrap tabular-nums",
+                      "flex items-center text-sm font-bold shrink-0 whitespace-nowrap tabular-nums",
                       transaction.type === "EXPENSE"
-                        ? "text-red-400"
-                        : "text-green-400"
+                        ? "text-rose-600"
+                        : "text-emerald-600"
                     )}
                   >
                     {transaction.type === "EXPENSE" ? (
-                      <ArrowDownRight className="mr-1.5 h-4 w-4 shrink-0" />
+                      <ArrowDownRight className="mr-1 h-3.5 w-3.5 shrink-0" />
                     ) : (
-                      <ArrowUpRight className="mr-1.5 h-4 w-4 shrink-0" />
+                      <ArrowUpRight className="mr-1 h-3.5 w-3.5 shrink-0" />
                     )}
                     <span>
-                      {transaction.type === "EXPENSE" ? "-" : "+"}₹{transaction.amount.toFixed(2)}
+                      {transaction.type === "EXPENSE" ? "-" : "+"}₹{transaction.amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                 </div>
@@ -214,22 +220,21 @@ export function DashboardOverview({ accounts = [], transactions = [] }) {
       </Card>
 
       {/* Expense Breakdown */}
-      <Card className="relative bg-[#1a1a1a]/80 border border-gray-700 shadow-xl rounded-2xl overflow-hidden transition-all duration-300">
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 via-transparent to-white/5 pointer-events-none" />
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
+      <Card className="bg-white border border-slate-200/90 shadow-xs rounded-2xl overflow-hidden">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b border-slate-100">
           <div>
-            <CardTitle className="text-base font-semibold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+            <CardTitle className="text-base font-bold text-slate-900">
               Expense Breakdown
             </CardTitle>
-            <p className="text-xs text-gray-400 mt-1">
-              Total: <span className="text-purple-300 font-medium">₹{totalExpenseAmount.toFixed(2)}</span>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Total: <span className="text-slate-900 font-semibold">₹{totalExpenseAmount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </p>
           </div>
           <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-[140px] bg-transparent border border-gray-600 text-white text-xs">
+            <SelectTrigger className="w-[130px] h-8 text-xs bg-slate-50 border-slate-200 text-slate-700 rounded-lg">
               <SelectValue placeholder="Timeframe" />
             </SelectTrigger>
-            <SelectContent className="bg-[#1a1a1a] border border-gray-700 text-gray-200">
+            <SelectContent className="bg-white border-slate-200 text-slate-800 rounded-xl">
               {Object.entries(TIME_RANGES).map(([key, label]) => (
                 <SelectItem key={key} value={key} className="text-xs">
                   {label}
@@ -238,22 +243,22 @@ export function DashboardOverview({ accounts = [], transactions = [] }) {
             </SelectContent>
           </Select>
         </CardHeader>
-        <CardContent className="p-0 pb-5 relative z-10">
+        <CardContent className="pt-4">
           {pieChartData.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-[260px] text-gray-400 text-center px-4 space-y-3">
+            <div className="flex flex-col items-center justify-center h-[260px] text-slate-400 text-center px-4 space-y-3">
               <p className="text-sm">No expenses recorded for {TIME_RANGES[timeRange].toLowerCase()}</p>
               {totalAllTimeExpenses > 0 && timeRange !== "ALL" && (
                 <button
                   type="button"
                   onClick={() => setTimeRange("ALL")}
-                  className="text-xs text-purple-400 hover:text-purple-300 underline underline-offset-4"
+                  className="text-xs text-blue-600 hover:text-blue-700 underline underline-offset-4 font-medium"
                 >
                   View all-time expenses (₹{totalAllTimeExpenses.toFixed(2)})
                 </button>
               )}
             </div>
           ) : (
-            <div className="h-[280px] text-white">
+            <div className="h-[270px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -261,7 +266,7 @@ export function DashboardOverview({ accounts = [], transactions = [] }) {
                     cx="50%"
                     cy="50%"
                     outerRadius={85}
-                    innerRadius={45}
+                    innerRadius={50}
                     paddingAngle={3}
                     dataKey="value"
                     fontSize={11}
@@ -270,7 +275,7 @@ export function DashboardOverview({ accounts = [], transactions = [] }) {
                       <Cell
                         key={`cell-${index}`}
                         fill={COLORS[index % COLORS.length]}
-                        stroke="#1a1a1a"
+                        stroke="#ffffff"
                         strokeWidth={2}
                       />
                     ))}
@@ -278,16 +283,17 @@ export function DashboardOverview({ accounts = [], transactions = [] }) {
                   <Tooltip
                     formatter={(value) => [`₹${Number(value).toFixed(2)}`, "Expense"]}
                     contentStyle={{
-                      backgroundColor: "#1f1035",
-                      border: "1px solid #7c3aed",
+                      backgroundColor: "#ffffff",
+                      border: "1px solid #e2e8f0",
                       borderRadius: "0.75rem",
-                      boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.5)",
+                      boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.08)",
+                      color: "#0f172a",
                     }}
-                    itemStyle={{ color: "#f3e8ff", fontWeight: 500 }}
-                    labelStyle={{ color: "#d8b4fe" }}
+                    itemStyle={{ color: "#0f172a", fontWeight: 600 }}
+                    labelStyle={{ color: "#64748b" }}
                   />
                   <Legend
-                    wrapperStyle={{ color: "#cccccc", fontSize: "12px", paddingTop: "8px" }}
+                    wrapperStyle={{ color: "#475569", fontSize: "12px", paddingTop: "8px" }}
                   />
                 </PieChart>
               </ResponsiveContainer>

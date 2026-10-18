@@ -59,47 +59,27 @@ export function GoalsView({ initialData, initialBehaviourData }) {
   const categories = Array.from(new Set(goals.map((g) => g.category)));
 
   return (
-    <div className="space-y-10">
-      {/* Top Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-black bg-gradient-to-r from-purple-300 via-pink-300 to-indigo-300 bg-clip-text text-transparent">
-            Your Financial Targets
-          </h2>
-          <p className="text-xs text-gray-300 mt-1">
-            Track allocations, project monthly savings, and hit milestones safely.
-          </p>
-        </div>
-
-        <Button
-          onClick={() => setIsCreateOpen(true)}
-          className="bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:opacity-95 text-white font-bold rounded-full px-5 py-2.5 text-xs shadow-[0_0_20px_rgba(168,85,247,0.5)] hover:scale-105 transition-all self-start sm:self-auto flex items-center gap-2 border border-purple-400/30"
-        >
-          <Plus className="w-4 h-4" />
-          Create New Goal
-        </Button>
-      </div>
-
+    <div className="space-y-8">
       {/* 1. Overview Summary Cards */}
       <GoalsOverviewCards overview={overview} />
 
       {/* 2. Goals Section Header & Category Filters */}
       <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-purple-800/30 pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">
           <div className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-purple-400" />
-            <h3 className="text-lg font-bold text-white">
+            <Target className="w-5 h-5 text-blue-600" />
+            <h3 className="text-lg font-bold text-slate-900">
               Active & Completed Goals ({filteredGoals.length})
             </h3>
           </div>
 
-          {/* Filters */}
-          <div className="flex flex-wrap items-center gap-2 text-xs">
+          {/* Action & Filter Controls */}
+          <div className="flex flex-wrap items-center gap-2">
             {categories.length > 0 && (
               <select
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
-                className="p-1.5 rounded-lg bg-[#0f051d] border border-purple-700/40 text-gray-300 focus:outline-none focus:border-purple-400 text-xs"
+                className="h-9 px-3 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs font-medium focus:outline-none focus:border-blue-500 shadow-2xs"
               >
                 <option value="ALL">All Categories</option>
                 {categories.map((c) => (
@@ -113,7 +93,7 @@ export function GoalsView({ initialData, initialBehaviourData }) {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="p-1.5 rounded-lg bg-[#0f051d] border border-purple-700/40 text-gray-300 focus:outline-none focus:border-purple-400 text-xs"
+              className="h-9 px-3 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs font-medium focus:outline-none focus:border-blue-500 shadow-2xs"
             >
               <option value="ALL">All Statuses</option>
               <option value="IN_PROGRESS">In Progress</option>
@@ -121,27 +101,35 @@ export function GoalsView({ initialData, initialBehaviourData }) {
               <option value="OVERDUE">Overdue</option>
               <option value="NOT_STARTED">Not Started</option>
             </select>
+
+            <Button
+              onClick={() => setIsCreateOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl px-4 py-2 text-xs shadow-xs transition-colors flex items-center gap-1.5 h-9"
+            >
+              <Plus className="w-4 h-4" />
+              <span>New Goal</span>
+            </Button>
           </div>
         </div>
 
         {/* Goals Grid */}
         {filteredGoals.length === 0 ? (
-          <div className="p-12 rounded-2xl bg-[#160a2c]/60 border border-purple-800/30 text-center space-y-4">
-            <div className="p-4 rounded-full bg-purple-900/30 text-purple-400 w-16 h-16 mx-auto flex items-center justify-center">
+          <div className="p-12 rounded-2xl bg-white border border-slate-200/90 text-center space-y-4 shadow-xs">
+            <div className="p-4 rounded-full bg-blue-50 text-blue-600 w-16 h-16 mx-auto flex items-center justify-center">
               <Target className="w-8 h-8" />
             </div>
             <div className="space-y-1">
-              <h4 className="text-base font-bold text-white">No Financial Goals Found</h4>
-              <p className="text-xs text-gray-400 max-w-sm mx-auto">
+              <h4 className="text-base font-bold text-slate-900">No Financial Goals Found</h4>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
                 {goals.length === 0
-                  ? "Start by creating your first financial goal. Track your emergency fund, dream vacation, new gadget, or house deposit."
+                  ? "Start by creating your first financial goal. Track emergency reserves, dream travel, equipment, or long-term wealth."
                   : "No goals match the selected filters. Try changing or resetting your category or status filters."}
               </p>
             </div>
             {goals.length === 0 && (
               <Button
                 onClick={() => setIsCreateOpen(true)}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-95 text-white text-xs font-bold rounded-xl px-5 py-2 shadow-lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl px-5 py-2 shadow-xs"
               >
                 <Plus className="w-4 h-4 mr-1.5" />
                 Create Your First Goal
@@ -168,7 +156,7 @@ export function GoalsView({ initialData, initialBehaviourData }) {
       </div>
 
       {/* 3. Dedicated Financial Planner Section */}
-      <div id="financial-planner-anchor" className="pt-6">
+      <div id="financial-planner-anchor" className="pt-4">
         <FinancialPlannerSection
           goals={goals}
           behaviourData={behaviourData}

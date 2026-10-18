@@ -40,8 +40,8 @@ function ProgressIndicator() {
   if (!loading) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[9999] h-1 bg-purple-950 overflow-hidden">
-      <div className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 animate-[pulse_1s_infinite] w-full shadow-[0_0_12px_#a855f7]" />
+    <div className="fixed top-0 left-0 right-0 z-[9999] h-1 bg-slate-100 overflow-hidden">
+      <div className="h-full bg-blue-600 animate-[pulse_1s_infinite] w-full" />
     </div>
   );
 }

@@ -65,33 +65,35 @@ export function DeleteGoalDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-[#160b28] border-red-500/40 text-white rounded-2xl">
+      <DialogContent className="max-w-md bg-white border border-slate-200 text-slate-900 rounded-2xl p-6 shadow-xl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-red-400 flex items-center gap-2">
-            <Trash2 className="w-5 h-5 text-red-400" />
+          <DialogTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+              <Trash2 className="w-4 h-4" />
+            </div>
             Delete Financial Goal
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 pt-2">
-          <p className="text-sm text-gray-300">
+          <p className="text-sm text-slate-600">
             Are you sure you want to delete{" "}
-            <span className="font-semibold text-white">&ldquo;{goal.name}&rdquo;</span>?
+            <span className="font-semibold text-slate-900">&ldquo;{goal.name}&rdquo;</span>?
           </p>
 
           {hasFunds ? (
-            <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-3">
-              <div className="flex items-start gap-2 text-amber-300">
-                <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
+            <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 space-y-3">
+              <div className="flex items-start gap-2 text-amber-800">
+                <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5 text-amber-600" />
                 <div>
-                  <p className="text-xs font-bold">
+                  <p className="text-xs font-bold text-amber-900">
                     This goal currently has ₹
                     {currentSaved.toLocaleString("en-IN", {
                       minimumFractionDigits: 2,
                     })}{" "}
                     allocated.
                   </p>
-                  <p className="text-[11px] text-gray-300 mt-1">
+                  <p className="text-[11px] text-amber-800/90 mt-1">
                     What would you like to do with these funds?
                   </p>
                 </div>
@@ -99,19 +101,19 @@ export function DeleteGoalDialog({
 
               {/* Decision radio */}
               <div className="space-y-2 pt-1 text-xs">
-                <label className="flex items-center gap-2.5 p-2 rounded-lg bg-black/30 border border-purple-800/40 cursor-pointer">
+                <label className="flex items-start gap-2.5 p-2.5 rounded-xl bg-white border border-slate-200 cursor-pointer shadow-2xs">
                   <input
                     type="radio"
                     name="fundAction"
                     checked={releaseFunds}
                     onChange={() => setReleaseFunds(true)}
-                    className="text-purple-600 focus:ring-0"
+                    className="mt-0.5 text-blue-600 focus:ring-0"
                   />
                   <div>
-                    <span className="font-semibold text-white">
+                    <span className="font-semibold text-slate-900 block">
                       (Recommended) Refund ₹{currentSaved.toFixed(2)} to account
                     </span>
-                    <p className="text-[11px] text-gray-400">
+                    <p className="text-[11px] text-slate-500">
                       Returns the allocated money back to your bank balance safely.
                     </p>
                   </div>
@@ -119,16 +121,16 @@ export function DeleteGoalDialog({
 
                 {releaseFunds && (
                   <div className="pl-6 space-y-1">
-                    <label className="text-[11px] text-gray-300">
+                    <label className="text-[11px] text-slate-600 font-medium">
                       Refund destination account:
                     </label>
                     <select
                       value={targetAccountId}
                       onChange={(e) => setTargetAccountId(e.target.value)}
-                      className="w-full p-2 rounded-lg bg-[#0f051d] border border-purple-700/40 text-white text-xs focus:outline-none"
+                      className="w-full p-2 rounded-lg bg-white border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-blue-500"
                     >
                       {accounts.map((acc) => (
-                        <option key={acc.id} value={acc.id} className="bg-[#160b28]">
+                        <option key={acc.id} value={acc.id}>
                           {acc.name} — Current: ₹{Number(acc.balance).toFixed(2)}
                         </option>
                       ))}
@@ -136,19 +138,19 @@ export function DeleteGoalDialog({
                   </div>
                 )}
 
-                <label className="flex items-center gap-2.5 p-2 rounded-lg bg-black/30 border border-red-800/30 cursor-pointer">
+                <label className="flex items-start gap-2.5 p-2.5 rounded-xl bg-white border border-slate-200 cursor-pointer shadow-2xs">
                   <input
                     type="radio"
                     name="fundAction"
                     checked={!releaseFunds}
                     onChange={() => setReleaseFunds(false)}
-                    className="text-red-600 focus:ring-0"
+                    className="mt-0.5 text-rose-600 focus:ring-0"
                   />
                   <div>
-                    <span className="font-semibold text-red-300">
+                    <span className="font-semibold text-rose-700 block">
                       Discard allocation without refund
                     </span>
-                    <p className="text-[11px] text-gray-400">
+                    <p className="text-[11px] text-slate-500">
                       Deletes the goal allocation without restoring account balance.
                     </p>
                   </div>
@@ -156,7 +158,7 @@ export function DeleteGoalDialog({
               </div>
             </div>
           ) : (
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-slate-500">
               No funds are currently allocated to this goal. Deleting it will remove the
               goal and its record.
             </p>
@@ -168,7 +170,7 @@ export function DeleteGoalDialog({
               variant="outline"
               onClick={onClose}
               disabled={loading}
-              className="border-purple-500/40 text-gray-300 hover:text-white hover:bg-purple-900/30 rounded-xl"
+              className="border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl"
             >
               Cancel
             </Button>
@@ -176,7 +178,7 @@ export function DeleteGoalDialog({
               type="button"
               onClick={handleDelete}
               disabled={loading || (hasFunds && releaseFunds && !targetAccountId)}
-              className="bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-[0_0_15px_rgba(239,68,68,0.4)]"
+              className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-xs font-semibold"
             >
               {loading ? (
                 <>

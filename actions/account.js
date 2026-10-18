@@ -64,6 +64,7 @@ export async function bulkDeleteTransactions(transactionIds) {
 
     const user = await db.user.findUnique({
       where: { clerkUserId: userId },
+      select: { id: true },
     });
 
     if (!user) throw new Error("User not found");
@@ -147,6 +148,7 @@ export async function updateDefaultAccount(accountId) {
 
     const user = await db.user.findUnique({
       where: { clerkUserId: userId },
+      select: { id: true },
     });
 
     if (!user) {
@@ -171,7 +173,7 @@ export async function updateDefaultAccount(accountId) {
       data: { isDefault: true },
     });
 
-revalidatePath("/dashboard");
+    revalidatePath("/dashboard");
     return { success: true, data: serializeDecimal(account) };
   } catch (error) {
     return { success: false, error: error.message };
@@ -187,8 +189,11 @@ export async function deleteAccount(accountId) {
 
     const user = await db.user.findUnique({
       where: { clerkUserId: userId },
-      include: {
-        accounts: true,
+      select: {
+        id: true,
+        accounts: {
+          select: { id: true, isDefault: true, name: true },
+        },
       },
     });
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight, ArrowDownRight, Trash2, Loader2, AlertTriangle } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Trash2, Loader2, AlertTriangle, Wallet } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect } from "react";
 import useFetch from "@/hooks/use-fetch";
@@ -81,80 +81,93 @@ export function AccountCard({ account }) {
 
   return (
     <>
-      <Link href={`/account/${id}`} prefetch={true} className="block">
-        <div
-          className="relative 
-                     p-6 rounded-2xl bg-black/20 backdrop-blur-sm border border-purple-500/20 transition-all duration-300 
-                     hover:shadow-[0_0_20px_rgba(168,85,247,0.6)] 
-                     hover:scale-[1.02] group"
-        >
-          {/* Account Name + Default Switch & Delete Action */}
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-300">{name}</h3>
-            <div className="flex items-center gap-2">
-              <Switch
-                checked={isDefault}
-                onClick={handleDefaultChange}
-                disabled={updateDefaultLoading}
-                className="data-[state=checked]:bg-purple-600"
-                title={isDefault ? "Default Account" : "Set as Default Account"}
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
-                onClick={handleOpenDelete}
-                title="Delete Account"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+      <Link href={`/account/${id}`} prefetch={true} className="block group">
+        <div className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-200 flex flex-col justify-between min-h-[180px]">
+          {/* Header: Name + Default Switch & Delete */}
+          <div>
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200/60 flex items-center justify-center shrink-0">
+                  <Wallet className="w-4 h-4 text-blue-600" />
+                </div>
+                <h3 className="text-sm font-semibold text-slate-900 truncate" title={name}>
+                  {name}
+                </h3>
+              </div>
+
+              <div className="flex items-center gap-1.5 shrink-0">
+                <div
+                  className="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600"
+                  title={isDefault ? "Default Account" : "Toggle Default"}
+                >
+                  <span className="hidden sm:inline">Default</span>
+                  <Switch
+                    checked={isDefault}
+                    onClick={handleDefaultChange}
+                    disabled={updateDefaultLoading}
+                    className="scale-75 data-[state=checked]:bg-blue-600"
+                  />
+                </div>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                  onClick={handleOpenDelete}
+                  title="Delete Account"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Balance */}
+            <div className="mt-4">
+              <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                ₹{parseFloat(balance).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+              <p className="text-xs font-medium text-slate-500 mt-0.5">
+                {type.charAt(0) + type.slice(1).toLowerCase()} Account
+              </p>
             </div>
           </div>
 
-        {/* Balance */}
-        <div className="text-3xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-          ₹{parseFloat(balance).toFixed(2)}
-        </div>
-        <p className="mt-1 text-sm text-gray-400">
-          {type.charAt(0) + type.slice(1).toLowerCase()} Account
-        </p>
-
-        {/* Footer */}
-        <div className="flex justify-between mt-6 text-sm text-gray-400">
-          <div className="flex items-center">
-            <ArrowUpRight className="mr-1 h-4 w-4 text-green-500" />
-            Income
-          </div>
-          <div className="flex items-center">
-            <ArrowDownRight className="mr-1 h-4 w-4 text-red-500" />
-            Expense
+          {/* Footer Indicators */}
+          <div className="flex justify-between items-center mt-5 pt-3 border-t border-slate-100 text-xs font-medium text-slate-500">
+            <span className="flex items-center text-emerald-600">
+              <ArrowUpRight className="mr-1 h-3.5 w-3.5" />
+              Incoming
+            </span>
+            <span className="flex items-center text-rose-500">
+              <ArrowDownRight className="mr-1 h-3.5 w-3.5" />
+              Outgoing
+            </span>
           </div>
         </div>
-      </div>
-    </Link>
+      </Link>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent
-          className="sm:max-w-md"
+          className="sm:max-w-md bg-white border border-slate-200 text-slate-900 rounded-2xl shadow-xl"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
           }}
         >
           <DialogHeader>
-            <div className="flex items-center gap-2 text-red-400">
+            <div className="flex items-center gap-2 text-rose-600">
               <AlertTriangle className="h-5 w-5" />
-              <DialogTitle className="text-xl font-bold">Delete Account</DialogTitle>
+              <DialogTitle className="text-lg font-bold text-slate-900">Delete Account</DialogTitle>
             </div>
-            <DialogDescription className="text-gray-300 pt-2 text-sm leading-relaxed">
-              Are you sure you want to delete <span className="font-semibold text-white">&ldquo;{name}&rdquo;</span>?
+            <DialogDescription className="text-slate-600 pt-2 text-sm leading-relaxed">
+              Are you sure you want to delete <span className="font-semibold text-slate-900">&ldquo;{name}&rdquo;</span>?
               All associated transactions will be permanently deleted. This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
 
           {isDefault && (
-            <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 text-xs">
+            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs leading-relaxed">
               ⚠️ This is currently your default account. If deleted, another account will automatically be designated as your default account.
             </div>
           )}
@@ -162,14 +175,14 @@ export function AccountCard({ account }) {
           <DialogFooter className="gap-2 sm:gap-0 mt-4">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 setDeleteOpen(false);
               }}
               disabled={deleteLoading}
-              className="text-gray-400 hover:text-white"
+              className="border-slate-300 text-slate-700 hover:bg-slate-100 rounded-xl"
             >
               Cancel
             </Button>
@@ -178,7 +191,7 @@ export function AccountCard({ account }) {
               variant="destructive"
               onClick={handleDeleteConfirm}
               disabled={deleteLoading}
-              className="bg-red-600 hover:bg-red-700 text-white gap-1.5"
+              className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl gap-1.5"
             >
               {deleteLoading ? (
                 <>

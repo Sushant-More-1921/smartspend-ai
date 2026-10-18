@@ -92,24 +92,26 @@ export function WithdrawFundsDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-[#160b28] border-purple-500/40 text-white rounded-2xl">
+      <DialogContent className="max-w-md bg-white border border-slate-200 text-slate-900 rounded-2xl p-6 shadow-xl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent flex items-center gap-2">
-            <ArrowDownCircle className="w-5 h-5 text-amber-400" />
+          <DialogTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+              <ArrowDownCircle className="w-4 h-4" />
+            </div>
             Release Funds from Goal
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           {/* Current Allocation Info */}
-          <div className="p-3.5 rounded-xl bg-purple-950/40 border border-purple-800/40 space-y-1">
-            <div className="flex justify-between items-center text-xs text-gray-400">
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
+            <div className="flex justify-between items-center text-xs text-slate-500">
               <span>Goal</span>
-              <span className="font-semibold text-purple-300">{goal.name}</span>
+              <span className="font-semibold text-slate-900">{goal.name}</span>
             </div>
             <div className="flex justify-between items-baseline pt-1">
-              <span className="text-xs text-gray-300">Currently Allocated:</span>
-              <span className="text-lg font-bold text-emerald-400">
+              <span className="text-xs text-slate-600">Currently Allocated:</span>
+              <span className="text-lg font-bold text-emerald-600">
                 ₹{currentSaved.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </span>
             </div>
@@ -118,7 +120,7 @@ export function WithdrawFundsDialog({
                 <button
                   type="button"
                   onClick={handleWithdrawAll}
-                  className="text-xs text-purple-400 hover:text-purple-300 underline font-medium"
+                  className="text-xs text-blue-600 hover:text-blue-700 underline font-medium"
                 >
                   Release Full Amount (₹{currentSaved.toFixed(2)})
                 </button>
@@ -128,16 +130,16 @@ export function WithdrawFundsDialog({
 
           {/* Destination Account */}
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-gray-300">
+            <label className="text-xs font-medium text-slate-700">
               Destination Account
             </label>
             <select
               value={targetAccountId}
               onChange={(e) => setTargetAccountId(e.target.value)}
-              className="w-full p-2.5 rounded-xl bg-[#0f051d] border border-purple-700/40 text-white text-sm focus:outline-none focus:border-purple-400"
+              className="w-full p-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
             >
               {accounts.map((acc) => (
-                <option key={acc.id} value={acc.id} className="bg-[#160b28]">
+                <option key={acc.id} value={acc.id}>
                   {acc.name} ({acc.type}) — Current balance: ₹
                   {Number(acc.balance).toFixed(2)}
                 </option>
@@ -147,11 +149,11 @@ export function WithdrawFundsDialog({
 
           {/* Amount to Release */}
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-gray-300">
+            <label className="text-xs font-medium text-slate-700">
               Amount to Release (₹)
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-2.5 text-gray-400 font-medium">
+              <span className="absolute left-3 top-2.5 text-slate-400 font-medium text-sm">
                 ₹
               </span>
               <Input
@@ -162,12 +164,12 @@ export function WithdrawFundsDialog({
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="pl-7 bg-[#0f051d] border-purple-700/40 text-white focus:border-purple-400 font-semibold"
+                className="pl-7 bg-white border-slate-200 text-slate-900 focus:border-blue-500 font-semibold rounded-lg text-sm"
                 required
               />
             </div>
             {isAmountTooHigh && (
-              <p className="text-xs text-red-400 flex items-center gap-1 mt-1">
+              <p className="text-xs text-rose-600 flex items-center gap-1 mt-1">
                 <AlertTriangle className="w-3.5 h-3.5" />
                 Amount exceeds saved balance in this goal
               </p>
@@ -176,7 +178,7 @@ export function WithdrawFundsDialog({
 
           {/* Optional Note */}
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-gray-300">
+            <label className="text-xs font-medium text-slate-700">
               Note (Optional)
             </label>
             <Input
@@ -184,12 +186,12 @@ export function WithdrawFundsDialog({
               placeholder="e.g. Needed emergency cash, reallocating"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="bg-[#0f051d] border-purple-700/40 text-white focus:border-purple-400 text-sm"
+              className="bg-white border-slate-200 text-slate-900 focus:border-blue-500 rounded-lg text-sm"
               maxLength={100}
             />
           </div>
 
-          <p className="text-[11px] text-gray-400 italic">
+          <p className="text-[11px] text-slate-400 italic">
             * This returns the money directly to your chosen bank account and creates
             a persistent refund record in the goal history.
           </p>
@@ -200,14 +202,14 @@ export function WithdrawFundsDialog({
               variant="outline"
               onClick={onClose}
               disabled={loading}
-              className="border-purple-500/40 text-gray-300 hover:text-white hover:bg-purple-900/30 rounded-xl"
+              className="border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={loading || numAmount <= 0 || isAmountTooHigh}
-              className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white rounded-xl shadow-[0_0_15px_rgba(245,158,11,0.3)]"
+              className="bg-amber-600 hover:bg-amber-700 text-white rounded-xl shadow-xs font-semibold"
             >
               {loading ? (
                 <>

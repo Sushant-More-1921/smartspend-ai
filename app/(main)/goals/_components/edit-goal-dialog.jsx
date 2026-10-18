@@ -81,10 +81,12 @@ function EditGoalForm({ goal, onClose, onSuccess }) {
   };
 
   return (
-    <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-[#160b28] border-purple-500/40 text-white rounded-2xl">
+    <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-white border border-slate-200 text-slate-900 rounded-2xl p-6 shadow-xl">
       <DialogHeader>
-        <DialogTitle className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center gap-2">
-          <Edit3 className="w-5 h-5 text-purple-400" />
+        <DialogTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+            <Edit3 className="w-4 h-4" />
+          </div>
           Edit Financial Goal
         </DialogTitle>
       </DialogHeader>
@@ -92,14 +94,14 @@ function EditGoalForm({ goal, onClose, onSuccess }) {
       <form onSubmit={handleSubmit} className="space-y-4 pt-2">
         {/* Goal Name */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-gray-300">
-            Goal Name <span className="text-pink-400">*</span>
+          <label className="text-xs font-medium text-slate-700">
+            Goal Name <span className="text-rose-500">*</span>
           </label>
           <Input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="bg-[#0f051d] border-purple-700/40 text-white focus:border-purple-400"
+            className="bg-white border-slate-200 text-slate-900 focus:border-blue-500 rounded-lg text-sm"
             required
           />
         </div>
@@ -107,16 +109,16 @@ function EditGoalForm({ goal, onClose, onSuccess }) {
         {/* Category & Target Date */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-gray-300">
+            <label className="text-xs font-medium text-slate-700">
               Category
             </label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full p-2.5 rounded-xl bg-[#0f051d] border border-purple-700/40 text-white text-sm focus:outline-none focus:border-purple-400"
+              className="w-full p-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
             >
               {GOAL_CATEGORIES.map((cat) => (
-                <option key={cat} value={cat} className="bg-[#160b28]">
+                <option key={cat} value={cat}>
                   {cat}
                 </option>
               ))}
@@ -124,21 +126,21 @@ function EditGoalForm({ goal, onClose, onSuccess }) {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-gray-300">
+            <label className="text-xs font-medium text-slate-700">
               Target Date (Optional)
             </label>
             <Input
               type="date"
               value={targetDate}
               onChange={(e) => setTargetDate(e.target.value)}
-              className="bg-[#0f051d] border-purple-700/40 text-white focus:border-purple-400 [color-scheme:dark]"
+              className="bg-white border-slate-200 text-slate-900 focus:border-blue-500 rounded-lg text-sm"
             />
           </div>
         </div>
 
         {/* Icon Selector */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-gray-300">
+          <label className="text-xs font-medium text-slate-700">
             Goal Icon
           </label>
           <IconPicker selected={icon} onSelect={setIcon} />
@@ -147,15 +149,15 @@ function EditGoalForm({ goal, onClose, onSuccess }) {
         {/* Target Amount */}
         <div className="space-y-1.5">
           <div className="flex justify-between items-center">
-            <label className="text-xs font-medium text-gray-300">
-              Target Amount (₹) <span className="text-pink-400">*</span>
+            <label className="text-xs font-medium text-slate-700">
+              Target Amount (₹) <span className="text-rose-500">*</span>
             </label>
-            <span className="text-xs text-purple-300">
+            <span className="text-xs text-slate-500">
               Currently Saved: ₹{currentSaved.toLocaleString("en-IN")}
             </span>
           </div>
           <div className="relative">
-            <span className="absolute left-3 top-2.5 text-gray-400 font-medium">
+            <span className="absolute left-3 top-2.5 text-slate-400 font-medium text-sm">
               ₹
             </span>
             <Input
@@ -164,13 +166,13 @@ function EditGoalForm({ goal, onClose, onSuccess }) {
               min="1"
               value={targetAmount}
               onChange={(e) => setTargetAmount(e.target.value)}
-              className="pl-7 bg-[#0f051d] border-purple-700/40 text-white focus:border-purple-400 font-semibold"
+              className="pl-7 bg-white border-slate-200 text-slate-900 focus:border-blue-500 font-semibold rounded-lg text-sm"
               required
             />
           </div>
           {isTargetBelowSaved && (
-            <p className="text-xs text-amber-300 flex items-center gap-1 mt-1">
-              <AlertCircle className="w-3.5 h-3.5" />
+            <p className="text-xs text-amber-700 flex items-center gap-1 mt-1">
+              <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
               New target is lower than saved amount (₹{currentSaved.toFixed(2)}).
               This will mark the goal as Completed.
             </p>
@@ -179,7 +181,7 @@ function EditGoalForm({ goal, onClose, onSuccess }) {
 
         {/* Expected Return Rate */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-gray-300">
+          <label className="text-xs font-medium text-slate-700">
             Assumed Annual Investment Return (%)
           </label>
           <Input
@@ -189,20 +191,20 @@ function EditGoalForm({ goal, onClose, onSuccess }) {
             max="100"
             value={expectedReturnRate}
             onChange={(e) => setExpectedReturnRate(e.target.value)}
-            className="bg-[#0f051d] border-purple-700/40 text-white focus:border-purple-400"
+            className="bg-white border-slate-200 text-slate-900 focus:border-blue-500 rounded-lg text-sm"
           />
         </div>
 
         {/* Description */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-gray-300">
+          <label className="text-xs font-medium text-slate-700">
             Description (Optional)
           </label>
           <Input
             type="text"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="bg-[#0f051d] border-purple-700/40 text-white focus:border-purple-400"
+            className="bg-white border-slate-200 text-slate-900 focus:border-blue-500 rounded-lg text-sm"
             maxLength={200}
           />
         </div>
@@ -212,14 +214,14 @@ function EditGoalForm({ goal, onClose, onSuccess }) {
             type="button"
             variant="outline"
             onClick={onClose}
-            className="border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl"
+            className="border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl"
           >
             Cancel
           </Button>
           <Button
             type="submit"
             disabled={loading}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-95 text-white font-bold rounded-xl px-5 shadow-lg flex items-center gap-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl px-5 shadow-xs flex items-center gap-2"
           >
             {loading && <Loader2 className="w-4 h-4 animate-spin" />}
             Save Changes

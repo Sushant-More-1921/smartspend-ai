@@ -114,49 +114,51 @@ export function AddMoneyDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-[#160b28] border-purple-500/40 text-white rounded-2xl">
+      <DialogContent className="max-w-md bg-white border border-slate-200 text-slate-900 rounded-2xl p-6 shadow-xl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center gap-2">
-            <PlusCircle className="w-5 h-5 text-purple-400" />
+          <DialogTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+              <PlusCircle className="w-4 h-4" />
+            </div>
             Add Money to Goal
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           {/* Goal Summary Header */}
-          <div className="p-3 rounded-xl bg-purple-950/40 border border-purple-800/40 space-y-1">
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
             <div className="flex justify-between items-center">
-              <span className="text-xs text-gray-400">Target Goal</span>
-              <span className="text-xs font-semibold text-purple-300">
+              <span className="text-xs text-slate-500">Target Goal</span>
+              <span className="text-xs font-semibold text-slate-900">
                 {goal.name}
               </span>
             </div>
             <div className="flex justify-between items-baseline pt-1">
               <div>
-                <p className="text-[11px] text-gray-400">Current Saved</p>
-                <p className="text-base font-bold text-white">
+                <p className="text-[11px] text-slate-500">Current Saved</p>
+                <p className="text-base font-bold text-slate-900">
                   ₹{currentSaved.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </p>
               </div>
-              <ArrowRight className="w-4 h-4 text-gray-500" />
+              <ArrowRight className="w-4 h-4 text-slate-400" />
               <div className="text-right">
-                <p className="text-[11px] text-gray-400">Target Amount</p>
-                <p className="text-base font-bold text-pink-400">
+                <p className="text-[11px] text-slate-500">Target Amount</p>
+                <p className="text-base font-bold text-blue-600">
                   ₹{targetAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </p>
               </div>
             </div>
-            <div className="pt-2 flex justify-between items-center text-xs border-t border-purple-800/30">
-              <span className="text-gray-400">Still needed:</span>
+            <div className="pt-2 flex justify-between items-center text-xs border-t border-slate-200/60">
+              <span className="text-slate-500">Still needed:</span>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-amber-300">
+                <span className="font-semibold text-amber-600">
                   ₹{remaining.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </span>
                 {remaining > 0 && accountBalance > 0 && (
                   <button
                     type="button"
                     onClick={handleFillRemaining}
-                    className="text-[10px] text-purple-400 hover:text-purple-300 underline font-medium"
+                    className="text-[10px] text-blue-600 hover:text-blue-700 underline font-medium"
                   >
                     Auto-Fill
                   </button>
@@ -167,19 +169,19 @@ export function AddMoneyDialog({
 
           {/* Source Account Selection */}
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-gray-300 flex justify-between">
+            <label className="text-xs font-medium text-slate-700 flex justify-between">
               <span>Source Account</span>
-              <span className="text-purple-300">
+              <span className="text-slate-500 font-normal">
                 Available: ₹{accountBalance.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </span>
             </label>
             <select
               value={selectedAccountId}
               onChange={(e) => setSelectedAccountId(e.target.value)}
-              className="w-full p-2.5 rounded-xl bg-[#0f051d] border border-purple-700/40 text-white text-sm focus:outline-none focus:border-purple-400"
+              className="w-full p-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
             >
               {accounts.map((acc) => (
-                <option key={acc.id} value={acc.id} className="bg-[#160b28]">
+                <option key={acc.id} value={acc.id}>
                   {acc.name} ({acc.type}) — ₹{Number(acc.balance).toFixed(2)}
                 </option>
               ))}
@@ -188,11 +190,11 @@ export function AddMoneyDialog({
 
           {/* Contribution Amount */}
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-gray-300">
+            <label className="text-xs font-medium text-slate-700">
               Contribution Amount (₹)
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-2.5 text-gray-400 font-medium">
+              <span className="absolute left-3 top-2.5 text-slate-400 font-medium text-sm">
                 ₹
               </span>
               <Input
@@ -202,12 +204,12 @@ export function AddMoneyDialog({
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="pl-7 bg-[#0f051d] border-purple-700/40 text-white focus:border-purple-400"
+                className="pl-7 bg-white border-slate-200 text-slate-900 focus:border-blue-500 rounded-lg text-sm"
                 required
               />
             </div>
             {isBalanceExceeded && (
-              <p className="text-xs text-red-400 flex items-center gap-1 mt-1">
+              <p className="text-xs text-rose-600 flex items-center gap-1 mt-1">
                 <AlertCircle className="w-3.5 h-3.5" />
                 Amount exceeds available balance in {selectedAccount?.name}
               </p>
@@ -216,18 +218,18 @@ export function AddMoneyDialog({
 
           {/* Overfunding warning checkbox */}
           {isOverfunding && (
-            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs space-y-1.5">
-              <p className="text-amber-300 font-medium flex items-center gap-1.5">
-                <AlertCircle className="w-4 h-4 shrink-0" />
+            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs space-y-1.5">
+              <p className="text-amber-800 font-medium flex items-center gap-1.5">
+                <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
                 This amount exceeds the remaining goal target by ₹
                 {(numAmount - remaining).toFixed(2)}.
               </p>
-              <label className="flex items-center gap-2 text-gray-300 cursor-pointer pt-1">
+              <label className="flex items-center gap-2 text-slate-700 cursor-pointer pt-1">
                 <input
                   type="checkbox"
                   checked={allowOverfunding}
                   onChange={(e) => setAllowOverfunding(e.target.checked)}
-                  className="rounded border-purple-500/40 text-purple-600 focus:ring-0"
+                  className="rounded border-slate-300 text-blue-600 focus:ring-0"
                 />
                 <span>I understand and want to allocate extra funds</span>
               </label>
@@ -236,7 +238,7 @@ export function AddMoneyDialog({
 
           {/* Optional Note */}
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-gray-300">
+            <label className="text-xs font-medium text-slate-700">
               Note (Optional)
             </label>
             <Input
@@ -244,13 +246,13 @@ export function AddMoneyDialog({
               placeholder="e.g. October savings, Diwali bonus"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="bg-[#0f051d] border-purple-700/40 text-white focus:border-purple-400 text-sm"
+              className="bg-white border-slate-200 text-slate-900 focus:border-blue-500 rounded-lg text-sm"
               maxLength={100}
             />
           </div>
 
           {/* Notice of Accounting Preservation */}
-          <p className="text-[11px] text-gray-400 italic">
+          <p className="text-[11px] text-slate-400 italic">
             * Transferred safely from your account to this goal. This allocation is not
             recorded as an expense.
           </p>
@@ -261,7 +263,7 @@ export function AddMoneyDialog({
               variant="outline"
               onClick={onClose}
               disabled={loading}
-              className="border-purple-500/40 text-gray-300 hover:text-white hover:bg-purple-900/30 rounded-xl"
+              className="border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl"
             >
               Cancel
             </Button>
@@ -273,7 +275,7 @@ export function AddMoneyDialog({
                 isBalanceExceeded ||
                 (isOverfunding && !allowOverfunding)
               }
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.4)]"
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs font-semibold"
             >
               {loading ? (
                 <>

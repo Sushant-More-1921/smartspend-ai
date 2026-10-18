@@ -20,10 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ArrowUpRight, ArrowDownRight, Scale } from "lucide-react";
 
 const DATE_RANGES = {
   "7D": { label: "Last 7 Days", days: 7 },
-  "1M": { label: "Last Month", days: 30 },
+  "1M": { label: "Last 30 Days", days: 30 },
   "3M": { label: "Last 3 Months", days: 90 },
   "6M": { label: "Last 6 Months", days: 180 },
   ALL: { label: "All Time", days: null },
@@ -83,23 +84,26 @@ export function AccountChart({ transactions }) {
     );
   }, [filteredData]);
 
+  const netBalance = totals.income - totals.expense;
+
   return (
-    <Card className="relative w-full h-full bg-[#1e1133] space-y-0 border border-purple-800/30  backdrop-blur-lg rounded-2xl overflow-hidden transition-all duration-300">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7 relative z-10">
-        <CardTitle className="text-xl font-semibold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-          Transaction Overview
-        </CardTitle>
+    <Card className="w-full bg-white border border-slate-200/90 shadow-xs rounded-2xl overflow-hidden p-2">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b border-slate-100">
+        <div>
+          <CardTitle className="text-base font-bold text-slate-900">
+            Transaction Activity Overview
+          </CardTitle>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Cash inflow vs outflow over time
+          </p>
+        </div>
         <Select defaultValue={dateRange} onValueChange={setDateRange}>
-          <SelectTrigger className="w-[140px] bg-transparent border border-gray-700 text-gray-300 hover:border-white transition-colors">
+          <SelectTrigger className="w-[140px] h-8 text-xs bg-slate-50 border-slate-200 text-slate-700 rounded-lg">
             <SelectValue placeholder="Select range" />
           </SelectTrigger>
-          <SelectContent className="bg-[#1a1a1a] border border-gray-700 text-gray-200">
+          <SelectContent className="bg-white border-slate-200 text-slate-800 rounded-xl">
             {Object.entries(DATE_RANGES).map(([key, { label }]) => (
-              <SelectItem
-                key={key}
-                value={key}
-                className="hover:bg-white/10 hover:text-white transition-colors"
-              >
+              <SelectItem key={key} value={key} className="text-xs">
                 {label}
               </SelectItem>
             ))}
@@ -107,67 +111,82 @@ export function AccountChart({ transactions }) {
         </Select>
       </CardHeader>
 
-      <CardContent className="relative z-10">
-        <div className="flex justify-around mb-6 text-sm">
-          <div className="text-center">
-            <p className="text-gray-400">Total Income</p>
-            <p className="text-lg font-bold text-green-400">
-              ₹{totals.income.toFixed(2)}
+      <CardContent className="pt-4">
+        {/* KPI Strip */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+            <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+              <span>Total Income</span>
+              <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600" />
+            </div>
+            <p className="text-xl font-bold text-emerald-600 tabular-nums">
+              ₹{totals.income.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
-          <div className="text-center">
-            <p className="text-gray-400">Total Expenses</p>
-            <p className="text-lg font-bold text-red-400">
-              ₹{totals.expense.toFixed(2)}
+
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+            <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+              <span>Total Expenses</span>
+              <ArrowDownRight className="w-3.5 h-3.5 text-rose-500" />
+            </div>
+            <p className="text-xl font-bold text-rose-600 tabular-nums">
+              ₹{totals.expense.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
-          <div className="text-center">
-            <p className="text-gray-400">Net</p>
+
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+            <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+              <span>Net Flow</span>
+              <Scale className="w-3.5 h-3.5 text-blue-600" />
+            </div>
             <p
-              className={`text-lg font-bold ${
-                totals.income - totals.expense >= 0
-                  ? "text-green-400"
-                  : "text-red-400"
+              className={`text-xl font-bold tabular-nums ${
+                netBalance >= 0 ? "text-emerald-600" : "text-rose-600"
               }`}
             >
-              ₹{(totals.income - totals.expense).toFixed(2)}
+              {netBalance >= 0 ? "+" : ""}₹{netBalance.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
         </div>
-        <div className="h-[300px]">
+
+        {/* Chart */}
+        <div className="h-[280px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={filteredData}
               margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
             >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
               <XAxis
                 dataKey="date"
-                fontSize={12}
+                fontSize={11}
                 tickLine={false}
-                axisLine={false}
-                stroke="#aaa"
+                axisLine={{ stroke: "#e2e8f0" }}
+                stroke="#64748b"
               />
               <YAxis
-                fontSize={12}
+                fontSize={11}
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(value) => `₹${value}`}
-                stroke="#aaa"
+                stroke="#64748b"
               />
               <Tooltip
-              cursor={{ fill: "transparent" }}
-                formatter={(value) => [`₹${value}`, undefined]}
+                cursor={{ fill: "#f8fafc" }}
+                formatter={(value) => [`₹${Number(value).toLocaleString("en-IN")}`, undefined]}
                 contentStyle={{
-                  backgroundColor: "#1a1a1a",
-                  border: "1px solid #333",
-                  borderRadius: "8px",
-                  color: "#fff",
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "10px",
+                  color: "#0f172a",
+                  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.08)",
                 }}
               />
-              <Legend />
-              <Bar dataKey="income" name="Income" fill="#22c55e" radius={[4, 4, 0, 0]} activeBar={false} background={false} />
-              <Bar dataKey="expense" name="Expense" fill="#ef4444" radius={[4, 4, 0, 0]} activeBar={false} background={false} />
+              <Legend
+                wrapperStyle={{ color: "#475569", fontSize: "12px", paddingTop: "8px" }}
+              />
+              <Bar dataKey="income" name="Income" fill="#059669" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="expense" name="Expense" fill="#E11D48" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

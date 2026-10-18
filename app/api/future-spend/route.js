@@ -12,6 +12,7 @@ export async function POST(req) {
 
     const user = await db.user.findUnique({
       where: { clerkUserId: userId },
+      select: { id: true },
     });
     if (!user) {
       return NextResponse.json(
