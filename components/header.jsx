@@ -20,10 +20,10 @@ const Header = () => {
 
   const navLinks = [
     { name: "Home", href: "/" },
+    { name: "Financial Goals", href: "/goals" },
     { name: "Future Spend", href: "/future-spend" },
     { name: "Smart Budget", href: "/smart-budget" },
     { name: "Monthly Reports", href: "/reports" },
-    { name: "Know More", href: "/know-more" },
   ];
 
   return (
@@ -102,9 +102,52 @@ const Header = () => {
             <SignedIn>
               <UserButton
                 appearance={{
+                  variables: {
+                    colorBackground: "#ffffff",
+                    colorText: "#000000",
+                    colorTextSecondary: "#374151",
+                    colorInputBackground: "#ffffff",
+                    colorInputText: "#000000",
+                  },
                   elements: {
                     avatarBox:
                       "w-8 h-8 border-2 border-purple-500 shadow-[0_0_12px_rgba(168,85,247,0.5)] hover:scale-110 transition-transform",
+                    userButtonPopoverCard:
+                      "!bg-white !text-black shadow-2xl border border-gray-200 rounded-2xl",
+                    userButtonPopoverActionButton:
+                      "!text-gray-900 hover:!bg-gray-100 transition-colors",
+                    userButtonPopoverActionButtonText:
+                      "!text-gray-900 font-semibold",
+                    userButtonPopoverActionButtonIcon:
+                      "!text-gray-700",
+                    userButtonPopoverFooter:
+                      "!bg-gray-50 border-t border-gray-100",
+                  },
+                }}
+                userProfileProps={{
+                  appearance: {
+                    variables: {
+                      colorBackground: "#ffffff",
+                      colorText: "#000000",
+                      colorTextSecondary: "#374151",
+                      colorInputBackground: "#ffffff",
+                      colorInputText: "#000000",
+                    },
+                    elements: {
+                      card: "!bg-white !text-black shadow-2xl border border-gray-200",
+                      modalContent: "!bg-white !text-black",
+                      navbar: "!bg-gray-50 border-r border-gray-200",
+                      navbarButton: "!text-gray-800 hover:!bg-gray-100",
+                      headerTitle: "!text-black font-bold",
+                      headerSubtitle: "!text-gray-600",
+                      profileSectionTitleText: "!text-black font-semibold",
+                      profileSectionContent: "!text-black",
+                      profileSectionPrimaryButton: "!text-purple-600 font-medium",
+                      formFieldLabel: "!text-gray-800 font-medium",
+                      formFieldInput: "!bg-white !text-black border border-gray-300",
+                      breadcrumbsItem: "!text-gray-700",
+                      breadcrumbsItemDivider: "!text-gray-400",
+                    },
                   },
                 }}
               />

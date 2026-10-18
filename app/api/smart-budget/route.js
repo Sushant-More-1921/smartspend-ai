@@ -11,7 +11,9 @@ export async function POST(req) {
       return NextResponse.json({ error: "Invalid Email" }, { status: 400 });
     }
 
-    const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "http://localhost:8000";
+    const ML_SERVICE_URL = (
+      process.env.ML_SERVICE_URL || "http://localhost:8000"
+    ).replace(/\/$/, "");
 
     const resp = await fetch(`${ML_SERVICE_URL}/recommend`, {
       method: "POST",
@@ -23,23 +25,23 @@ export async function POST(req) {
     try {
       const json = JSON.parse(text || "{}");
       if (!resp.ok) {
-        const rawErr = String(json?.detail || json?.error || text || "").toLowerCase();
-        if (
-          rawErr.includes("db") ||
-          rawErr.includes("prisma") ||
-          rawErr.includes("not found") ||
-          resp.status === 404
-        ) {
-          return NextResponse.json({ error: "Invalid Email or user not found" }, { status: 400 });
-        }
-        return NextResponse.json({ error: json?.detail || json?.error || "Invalid Email" }, { status: resp.status });
+        return NextResponse.json(
+          { error: json?.detail || json?.error || "Recommendation service error" },
+          { status: resp.status }
+        );
       }
       return NextResponse.json(json);
     } catch {
-      return NextResponse.json({ error: "Invalid Email or recommendation service unavailable" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Recommendation service unavailable or invalid response" },
+        { status: 502 }
+      );
     }
   } catch (err) {
     console.error("api/smart-budget error:", err);
-    return NextResponse.json({ error: "Invalid Email or request failed" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Failed to connect to recommendation service" },
+      { status: 500 }
+    );
   }
 }

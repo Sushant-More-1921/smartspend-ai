@@ -44,13 +44,13 @@ export default function Hero() {
                 Get Started
               </Button>
             </Link>
-            <Link href="/know-more">
+            <Link href="/goals">
               <Button
                 size="lg"
                 variant="outline"
-                className="px-8 py-3 text-base font-semibold border-purple-400 text-purple-400 hover:bg-purple-600/10 hover:text-white rounded-full"
+                className="px-8 py-3 text-base font-semibold border-purple-400 text-purple-400 hover:bg-purple-600/10 hover:text-white rounded-full shadow-[0_0_15px_rgba(168,85,247,0.3)] transition"
               >
-                Know More
+                Financial Goals
               </Button>
             </Link>
           </div>

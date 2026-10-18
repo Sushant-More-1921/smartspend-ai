@@ -3,16 +3,16 @@ import { defaultCategories } from "@/data/categories";
 import { AddTransactionForm } from "../_components/transaction-form";
 import { getTransaction } from "@/actions/transaction";
 
+export const dynamic = "force-dynamic";
+
 export default async function AddTransactionPage({ searchParams }) {
   const params = await searchParams;
-  const accounts = await getUserAccounts();
   const editId = params?.edit;
 
-  let initialData = null;
-  if (editId) {
-    const transaction = await getTransaction(editId);
-    initialData = transaction;
-  }
+  const [accounts = [], initialData = null] = await Promise.all([
+    getUserAccounts(),
+    editId ? getTransaction(editId) : Promise.resolve(null),
+  ]);
 
   return (
    <div className="relative min-h-screen w-full bg-gradient-to-b from-[#0f051d] via-[#1a093c] to-[#120623] px-5 py-16 text-white overflow-hidden">

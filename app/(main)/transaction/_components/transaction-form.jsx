@@ -87,6 +87,17 @@ export function AddTransactionForm({
       amount: parseFloat(data.amount),
     };
 
+    if (!editMode && formData.type === "EXPENSE") {
+      const selectedAccount = accounts.find((a) => a.id === formData.accountId);
+      const currentBal = selectedAccount ? parseFloat(selectedAccount.balance) : 0;
+      if (formData.amount > currentBal) {
+        toast.error(
+          `Insufficient funds! Current account balance is ₹${currentBal.toFixed(2)}, so this expense of ₹${formData.amount.toFixed(2)} would make your account negative.`
+        );
+        return;
+      }
+    }
+
     if (editMode) {
       transactionFn(editId, formData);
     } else {
@@ -96,17 +107,37 @@ export function AddTransactionForm({
 
   const handleScanComplete = (scannedData) => {
     if (scannedData) {
+      setValue("type", "EXPENSE");
       setValue("amount", scannedData.amount.toString());
-      setValue("date", new Date(scannedData.date));
+      if (scannedData.date) {
+        const d = new Date(scannedData.date);
+        setValue("date", !isNaN(d.getTime()) ? d : new Date());
+      }
       if (scannedData.description) {
         setValue("description", scannedData.description);
       }
       if (scannedData.category) {
         setValue("category", scannedData.category);
       }
-      toast.success("Receipt scanned successfully", { id: "receipt-scan-toast" });
     }
   };
+
+  useEffect(() => {
+    if (editMode && initialData) {
+      reset({
+        type: initialData.type,
+        amount: initialData.amount.toString(),
+        description: initialData.description || "",
+        accountId: initialData.accountId,
+        category: initialData.category,
+        date: new Date(initialData.date),
+        isRecurring: initialData.isRecurring || false,
+        ...(initialData.recurringInterval && {
+          recurringInterval: initialData.recurringInterval,
+        }),
+      });
+    }
+  }, [editMode, initialData, reset]);
 
   useEffect(() => {
     if (transactionResult?.success && !transactionLoading) {
@@ -118,12 +149,25 @@ export function AddTransactionForm({
       );
       reset();
       router.push(`/account/${transactionResult.data.accountId}`);
+      router.refresh();
+      setTimeout(() => {
+        router.refresh();
+      }, 150);
     }
-  }, [transactionResult, transactionLoading, editMode]);
+  }, [transactionResult, transactionLoading, editMode, reset, router]);
 
   const type = watch("type");
+  const accountId = watch("accountId");
+  const amount = watch("amount");
   const isRecurring = watch("isRecurring");
   const date = watch("date");
+
+  const selectedAccount = accounts.find((a) => a.id === accountId);
+  const numAmount = parseFloat(amount) || 0;
+  const isExpense = type === "EXPENSE";
+  const availableBal = selectedAccount ? parseFloat(selectedAccount.balance) : 0;
+  const isInsufficientFunds =
+    !editMode && isExpense && numAmount > availableBal && numAmount > 0;
 
   const filteredCategories = categories.filter(
     (category) => category.type === type
@@ -172,6 +216,11 @@ export function AddTransactionForm({
           />
           {errors.amount && (
             <p className="text-sm text-red-500">{errors.amount.message}</p>
+          )}
+          {isInsufficientFunds && (
+            <p className="text-xs text-amber-400 mt-1 flex items-center gap-1 font-medium">
+              ⚠️ Expense exceeds available balance (₹{availableBal.toFixed(2)}). Account cannot go negative.
+            </p>
           )}
         </div>
 

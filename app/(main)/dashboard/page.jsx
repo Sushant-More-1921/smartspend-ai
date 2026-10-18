@@ -6,20 +6,21 @@ import { BudgetProgress } from "./_components/budget-progress";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 import { DashboardOverview } from "./_components/transaction-overview";
+import { GoalsDashboardCard } from "./_components/goals-dashboard-card";
+
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const { accounts, transactions } = await getDashboardOverviewData();
-
-  const defaultAccount = accounts?.find((account) => account.isDefault);
-
-  // Get budget for default account
-  let budgetData = null;
-  if (defaultAccount) {
-    budgetData = await getCurrentBudget(defaultAccount.id);
-  }
+  const [{ accounts = [], transactions = [] }, budgetData] = await Promise.all([
+    getDashboardOverviewData(),
+    getCurrentBudget(),
+  ]);
 
   return (
     <div className="space-y-8">
+      {/* Financial Goals & Planner Card */}
+      <GoalsDashboardCard />
+
       {/* Budget Progress */}
       <BudgetProgress
         initialBudget={budgetData?.budget}

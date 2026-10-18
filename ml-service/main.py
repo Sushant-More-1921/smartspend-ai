@@ -46,30 +46,20 @@ def fetch_user_transactions(email):
     try:
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
-        # find user id (try a few column names)
-        cur.execute("SELECT id FROM users WHERE email = %s", (email,))
+        # Find user id case-insensitively
+        cur.execute("SELECT id FROM users WHERE LOWER(email) = LOWER(%s)", (email.strip(),))
         row = cur.fetchone()
         if not row:
-            # try userId column
-            cur.execute("SELECT userId FROM users WHERE email = %s", (email,))
-            row = cur.fetchone()
-            if not row:
-                conn.close()
-                return pd.DataFrame(), None
+            conn.close()
+            return pd.DataFrame(), None
         user_id = row[0]
 
-        # try transactions then expenses
-        for table in ("transactions", "expenses"):
-            try:
-                cur.execute(f"SELECT date, category, amount FROM {table} WHERE userId = %s", (user_id,))
-                rows = cur.fetchall()
-                if rows:
-                    df = pd.DataFrame(rows, columns=["date", "category", "amount"])
-                    conn.close()
-                    return df, None
-            except Exception:
-                continue
+        # Query transactions with properly quoted "userId" column
+        cur.execute('SELECT date, category, amount FROM transactions WHERE "userId" = %s', (user_id,))
+        rows = cur.fetchall()
         conn.close()
+        if rows:
+            return pd.DataFrame(rows, columns=["date", "category", "amount"]), None
         return pd.DataFrame(), None
     except Exception as e:
         return None, str(e)

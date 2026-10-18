@@ -10,7 +10,7 @@ import {
 } from "@react-email/components";
 
 // Dummy data for preview
-const PREVIEW_DATA = {
+export const PREVIEW_DATA = {
   monthlyReport: {
     userName: "John Doe",
     type: "monthly-report",

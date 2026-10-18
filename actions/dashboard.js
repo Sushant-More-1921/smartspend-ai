@@ -95,11 +95,27 @@ export async function createAccount(data) {
     if (isNaN(balanceFloat)) {
       throw new Error("Invalid balance amount");
     }
+    if (balanceFloat < 0) {
+      throw new Error("Initial account balance cannot be negative.");
+    }
 
     // Check if this is the user's first account
     const existingAccounts = await db.account.findMany({
       where: { userId: user.id },
     });
+
+    const accountNameTrimmed = data.name.trim();
+
+    // Restriction: No two accounts can have the same name (case-insensitive)
+    const duplicateAccount = existingAccounts.find(
+      (acc) => acc.name.trim().toLowerCase() === accountNameTrimmed.toLowerCase()
+    );
+
+    if (duplicateAccount) {
+      throw new Error(
+        `An account with the name "${accountNameTrimmed}" already exists. Each account must have a unique name.`
+      );
+    }
 
     // If it's the first account, make it default regardless of user input
     // If not, use the user's preference
@@ -118,6 +134,7 @@ export async function createAccount(data) {
     const account = await db.account.create({
       data: {
         ...data,
+        name: accountNameTrimmed,
         balance: balanceFloat,
         userId: user.id,
         isDefault: shouldBeDefault, // Override the isDefault based on our logic
@@ -151,7 +168,8 @@ export async function getDashboardOverviewData() {
         },
       },
       transactions: {
-        orderBy: { date: "desc" },
+        orderBy: [{ date: "desc" }, { createdAt: "desc" }],
+        take: 50,
         select: {
           id: true,
           type: true,
@@ -160,6 +178,7 @@ export async function getDashboardOverviewData() {
           date: true,
           category: true,
           accountId: true,
+          createdAt: true,
         },
       },
     },

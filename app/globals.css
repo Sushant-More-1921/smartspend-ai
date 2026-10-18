@@ -8,18 +8,11 @@ body {
 
 html {
   scroll-behavior: smooth;
+
 }
 
-/* Hide scrollbar for Chrome, Safari, Opera, Edge, and Firefox */
-* {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-}
-
-*::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari, Opera */
-  width: 0;
-  height: 0;
+::-webkit-scrollbar {
+  display: none;
 }
 
 @layer base {
@@ -50,6 +43,7 @@ html {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -82,6 +76,7 @@ html {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -91,6 +86,7 @@ html {
   .gradient {
     @apply bg-gradient-to-br from-blue-600 to-purple-600;
   }
+
   .gradient-title {
     @apply gradient font-extrabold tracking-tighter pr-2 pb-2 text-transparent bg-clip-text;
   }
@@ -115,9 +111,11 @@ html {
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -132,9 +130,17 @@ html {
 
 /* Dark gradient background movement */
 @keyframes gradient-dark {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .animate-gradient-dark {
@@ -144,13 +150,255 @@ html {
 
 /* Fade in & pulse for text */
 @keyframes fadeText {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 .animate-fadeText {
   animation: fadeText 2.5s ease-in-out infinite;
 }
 
+/* Glassmorphic styling for standalone Clerk Auth elements (Sign In / Sign Up) */
+.cl-signIn-root .cl-card,
+.cl-signUp-root .cl-card,
+.cl-signIn-root .cl-footer,
+.cl-signUp-root .cl-footer,
+.cl-signIn-root .cl-footerAction,
+.cl-signUp-root .cl-footerAction,
+.cl-signIn-root .cl-footerPages,
+.cl-signUp-root .cl-footerPages,
+.cl-signIn-root [class*="cl-internal-"],
+.cl-signUp-root [class*="cl-internal-"] {
+  background: transparent !important;
+  background-image: none !important;
+  border-color: transparent !important;
+}
 
+.cl-signIn-root .cl-headerTitle,
+.cl-signUp-root .cl-headerTitle {
+  color: #ffffff !important;
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.025em !important;
+}
 
+.cl-signIn-root .cl-headerSubtitle,
+.cl-signUp-root .cl-headerSubtitle {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+}
+
+/* Built-in Clerk UserProfile & UserButton: White Background & Black Text */
+.cl-userButtonPopoverCard,
+.cl-userProfile-root,
+.cl-userProfileModalCard,
+.cl-modalContent {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.cl-userProfile-root .cl-card,
+.cl-userProfile-root .cl-scrollBox,
+.cl-userProfile-root [class*="cl-internal-"] {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.cl-userProfile-root .cl-navbar {
+  background-color: #f9fafb !important;
+  border-right: 1px solid #e5e7eb !important;
+}
+
+.cl-userProfile-root .cl-navbarButton {
+  color: #374151 !important;
+}
+
+.cl-userProfile-root .cl-navbarButton:hover,
+.cl-userProfile-root .cl-navbarButton[data-active="true"] {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+.cl-userProfile-root .cl-headerTitle,
+.cl-userProfile-root .cl-profileSectionTitleText,
+.cl-userProfile-root h1,
+.cl-userProfile-root h2,
+.cl-userProfile-root h3,
+.cl-userProfile-root h4,
+.cl-userProfile-root p,
+.cl-userProfile-root span,
+.cl-userProfile-root label,
+.cl-userButtonPopoverCard .cl-headerTitle,
+.cl-userButtonPopoverCard .cl-userButtonPopoverActionButtonText,
+.cl-userButtonPopoverCard p,
+.cl-userButtonPopoverCard span {
+  color: #111827 !important;
+}
+
+.cl-userProfile-root .cl-headerSubtitle,
+.cl-userProfile-root .cl-profileSectionSubtitleText,
+.cl-userProfile-root .cl-formFieldLabel {
+  color: #4b5563 !important;
+}
+
+.cl-userProfile-root .cl-formFieldInput {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border: 1px solid #d1d5db !important;
+}
+
+.cl-userButtonPopoverCard .cl-userButtonPopoverActionButton:hover {
+  background-color: #f3f4f6 !important;
+}
+
+.cl-userButtonPopoverCard .cl-userButtonPopoverFooter {
+  background-color: #f9fafb !important;
+  border-top: 1px solid #e5e7eb !important;
+}
+
+/* Social Buttons (Google, GitHub) */
+.cl-socialButtonsBlockButton {
+  background-color: rgba(255, 255, 255, 0.16) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+  color: #ffffff !important;
+  border-radius: 0.5rem !important;
+  font-weight: 600 !important;
+  padding: 0.4rem 0.75rem !important;
+}
+
+.cl-socialButtonsBlockButton:hover {
+  background-color: rgba(255, 255, 255, 0.28) !important;
+  border-color: rgba(255, 255, 255, 0.7) !important;
+  transform: translateY(-1px) !important;
+}
+
+.cl-socialButtonsBlockButtonText {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 0.75rem !important;
+}
+
+/* Divider */
+.cl-dividerRow {
+  margin-top: 0.4rem !important;
+  margin-bottom: 0.4rem !important;
+}
+
+.cl-dividerLine {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.cl-dividerText {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 0.7rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* Form Fields */
+.cl-form {
+  gap: 0.4rem !important;
+}
+
+.cl-formFieldRow {
+  margin-bottom: 0.4rem !important;
+}
+
+/* Form Label */
+.cl-formFieldLabel {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+  margin-bottom: 0.15rem !important;
+}
+
+/* Form Input - Solid white background with dark readable text (User Requested) */
+.cl-formFieldInput,
+.cl-otpCodeFieldInput {
+  background-color: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  padding: 0.4rem 0.75rem !important;
+}
+
+.cl-formFieldInput::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Primary Button (Continue / Sign In / Sign Up) - NO HOVER, NO SHADOW */
+.cl-formButtonPrimary {
+  background: linear-gradient(135deg, #9333ea 0%, #6366f1 50%, #ec4899 100%) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 0.8125rem !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 1rem !important;
+  border: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: none !important;
+  display: block !important;
+  width: 100% !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.cl-formButtonPrimary:hover,
+.cl-formButtonPrimary:focus,
+.cl-formButtonPrimary:active {
+  background: linear-gradient(135deg, #9333ea 0%, #6366f1 50%, #ec4899 100%) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  filter: none !important;
+}
+
+/* Footer & Links */
+.cl-footer {
+  margin-top: 0.75rem !important;
+  padding-top: 0.25rem !important;
+  position: relative !important;
+  clear: both !important;
+  width: 100% !important;
+}
+
+.cl-footerAction {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35rem !important;
+  width: 100% !important;
+  margin-top: 0.25rem !important;
+}
+
+.cl-footerActionText {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-size: 0.75rem !important;
+  display: inline-block !important;
+}
+
+.cl-footerActionLink {
+  color: #d8b4fe !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+  display: inline-block !important;
+}
+
+.cl-footerActionLink:hover {
+  color: #ffffff !important;
+}

@@ -9,31 +9,34 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  clerkUserId   String    @unique // clerk user id
-  email         String    @unique
-  name          String?
-  imageUrl      String?
-  transactions  Transaction[]
-  accounts      Account[]
-  budgets       Budget[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id                String             @id @default(uuid())
+  clerkUserId       String             @unique // clerk user id
+  email             String             @unique
+  name              String?
+  imageUrl          String?
+  transactions      Transaction[]
+  accounts          Account[]
+  budgets           Budget[]
+  goals             FinancialGoal[]
+  goalContributions GoalContribution[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
 
   @@map("users")
 }
 
 model Account {
-  id           String        @id @default(uuid())
-  name         String
-  type         AccountType
-  balance      Decimal       @default(0) // will ask inital balance while creating an account
-  isDefault    Boolean       @default(false)
-  userId       String
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions Transaction[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id                String             @id @default(uuid())
+  name              String
+  type              AccountType
+  balance           Decimal            @default(0) // will ask inital balance while creating an account
+  isDefault         Boolean            @default(false)
+  userId            String
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions      Transaction[]
+  goalContributions GoalContribution[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
 
   @@index([userId])
   @@map("accounts")
@@ -41,23 +44,23 @@ model Account {
 
 model Transaction {
   id                String            @id @default(uuid())
-  type             TransactionType
-  amount           Decimal
-  description      String?
-  date             DateTime
-  category         String           
-  receiptUrl       String?
-  isRecurring      Boolean           @default(false)
+  type              TransactionType
+  amount            Decimal
+  description       String?
+  date              DateTime
+  category          String           
+  receiptUrl        String?
+  isRecurring       Boolean           @default(false)
   recurringInterval RecurringInterval? // Only used if isRecurring is true
   nextRecurringDate DateTime?         // Next date for recurring transaction
-  lastProcessed    DateTime?         // Last time this recurring transaction was processed
-  status           TransactionStatus  @default(COMPLETED)
-  userId           String
-  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accountId        String
-  account          Account           @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  lastProcessed     DateTime?         // Last time this recurring transaction was processed
+  status            TransactionStatus  @default(COMPLETED)
+  userId            String
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId         String
+  account           Account           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 
   @@index([userId])
   @@index([accountId])
@@ -66,16 +69,70 @@ model Transaction {
 
 
 model Budget {
-  id          String       @id @default(uuid())
-  amount      Decimal
+  id            String       @id @default(uuid())
+  amount        Decimal
   lastAlertSent DateTime?  // Track when the last alert was sent
-  userId      String       @unique
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  userId        String       @unique
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
   @@index([userId])
   @@map("budgets")
+}
+
+model FinancialGoal {
+  id                 String             @id @default(uuid())
+  userId             String
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name               String
+  category           String
+  description        String?
+  targetAmount       Decimal            @db.Decimal(12, 2)
+  savedAmount        Decimal            @default(0) @db.Decimal(12, 2)
+  targetDate         DateTime?
+  status             GoalStatus         @default(IN_PROGRESS)
+  icon               String?
+  expectedReturnRate Decimal?           @default(0) @db.Decimal(5, 2)
+  contributions      GoalContribution[]
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@index([userId])
+  @@map("financial_goals")
+}
+
+model GoalContribution {
+  id              String               @id @default(uuid())
+  goalId          String
+  goal            FinancialGoal        @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceAccountId String?
+  sourceAccount   Account?             @relation(fields: [sourceAccountId], references: [id], onDelete: SetNull)
+  amount          Decimal              @db.Decimal(12, 2)
+  transactionType GoalContributionType @default(CONTRIBUTION)
+  note            String?
+  reference       String?
+  createdAt       DateTime             @default(now())
+
+  @@index([goalId])
+  @@index([userId])
+  @@index([sourceAccountId])
+  @@map("goal_contributions")
+}
+
+enum GoalStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+}
+
+enum GoalContributionType {
+  CONTRIBUTION
+  WITHDRAWAL
+  REFUND
 }
 
 enum TransactionType {

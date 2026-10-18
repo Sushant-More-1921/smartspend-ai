@@ -11,7 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { format, subDays, startOfDay, endOfDay } from "date-fns";
+import { format, subDays, startOfDay } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
@@ -30,7 +30,7 @@ const DATE_RANGES = {
 };
 
 export function AccountChart({ transactions }) {
-  const [dateRange, setDateRange] = useState("1M");
+  const [dateRange, setDateRange] = useState("ALL");
 
   const filteredData = useMemo(() => {
     const range = DATE_RANGES[dateRange];
@@ -39,28 +39,38 @@ export function AccountChart({ transactions }) {
       ? startOfDay(subDays(now, range.days))
       : startOfDay(new Date(0));
 
-    const filtered = transactions.filter(
-      (t) => new Date(t.date) >= startDate && new Date(t.date) <= endOfDay(now)
-    );
+    const txList = transactions || [];
+    const filtered = txList.filter((t) => {
+      if (!range.days) return true;
+      const txDate = new Date(t.date);
+      const createdDate = t.createdAt ? new Date(t.createdAt) : txDate;
+      return txDate >= startDate || createdDate >= startDate;
+    });
 
     const grouped = filtered.reduce((acc, transaction) => {
-      const date = transaction.date && !isNaN(new Date(transaction.date).getTime())
-        ? format(new Date(transaction.date), "MMM dd")
-        : "N/A";
-      if (!acc[date]) {
-        acc[date] = { date, income: 0, expense: 0 };
+      const rawDate = new Date(transaction.date);
+      const isValid = transaction.date && !isNaN(rawDate.getTime());
+      const dateKey = isValid ? format(rawDate, "yyyy-MM-dd") : "N/A";
+      const displayDate = isValid ? format(rawDate, "MMM dd") : "N/A";
+
+      if (!acc[dateKey]) {
+        acc[dateKey] = {
+          dateKey,
+          date: displayDate,
+          timestamp: isValid ? rawDate.getTime() : 0,
+          income: 0,
+          expense: 0,
+        };
       }
       if (transaction.type === "INCOME") {
-        acc[date].income += transaction.amount;
+        acc[dateKey].income += transaction.amount;
       } else {
-        acc[date].expense += transaction.amount;
+        acc[dateKey].expense += transaction.amount;
       }
       return acc;
     }, {});
 
-    return Object.values(grouped).sort(
-      (a, b) => new Date(a.date) - new Date(b.date)
-    );
+    return Object.values(grouped).sort((a, b) => a.timestamp - b.timestamp);
   }, [transactions, dateRange]);
 
   const totals = useMemo(() => {

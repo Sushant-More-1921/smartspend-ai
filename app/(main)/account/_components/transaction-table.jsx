@@ -77,7 +77,7 @@ export function TransactionTable({ transactions }) {
   const router = useRouter();
 
   const filteredAndSortedTransactions = useMemo(() => {
-    let result = [...transactions];
+    let result = transactions ? [...transactions] : [];
 
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
@@ -100,14 +100,23 @@ export function TransactionTable({ transactions }) {
     result.sort((a, b) => {
       let comparison = 0;
       switch (sortConfig.field) {
-        case "date":
-          comparison = new Date(a.date) - new Date(b.date);
+        case "date": {
+          const dateA = new Date(a.date).getTime();
+          const dateB = new Date(b.date).getTime();
+          const createdA = a.createdAt ? new Date(a.createdAt).getTime() : dateA;
+          const createdB = b.createdAt ? new Date(b.createdAt).getTime() : dateB;
+
+          comparison = dateA - dateB;
+          if (comparison === 0) {
+            comparison = createdA - createdB;
+          }
           break;
+        }
         case "amount":
           comparison = a.amount - b.amount;
           break;
         case "category":
-          comparison = a.category.localeCompare(b.category);
+          comparison = (a.category || "").localeCompare(b.category || "");
           break;
       }
       return sortConfig.direction === "asc" ? comparison : -comparison;
@@ -168,9 +177,10 @@ export function TransactionTable({ transactions }) {
 
   useEffect(() => {
     if (deleted && !deleteLoading) {
-      toast.error("Transactions deleted successfully");
+      toast.success("Transactions deleted successfully");
+      router.refresh();
     }
-  }, [deleted, deleteLoading]);
+  }, [deleted, deleteLoading, router]);
 
   const handleClearFilters = () => {
     setSearchTerm("");
@@ -382,15 +392,13 @@ export function TransactionTable({ transactions }) {
                   </TableCell>
                   <TableCell
                     className={cn(
-                      "text-right font-medium",
+                      "text-right font-medium whitespace-nowrap tabular-nums",
                       transaction.type === "EXPENSE"
                         ? "text-red-400"
                         : "text-green-400"
                     )}
                   >
-                    {transaction.type === "EXPENSE" ? "-" : "+"}₹{
-                      transaction.amount.toFixed(2)
-                    }
+                    {transaction.type === "EXPENSE" ? "-" : "+"}₹{transaction.amount.toFixed(2)}
                   </TableCell>
                   <TableCell>
                     {transaction.isRecurring ? (

@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
+
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 import utc from "dayjs/plugin/utc";
@@ -24,6 +25,7 @@ function sanitizePdfText(str) {
 async function getReportData(filter, dateStr) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
+
 
   const date = dayjs(dateStr);
   let start, end;

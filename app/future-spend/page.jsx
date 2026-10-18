@@ -77,7 +77,7 @@ export default function FutureSpendPage() {
           disabled={loading}
           className="mt-4 w-full md:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-[0_0_25px_rgba(139,92,246,0.8)] font-semibold"
         >
-          {loading ? "Simulating..." : "Run Simulation"}
+          {loading ? "Simulating..." : "Submit"}
         </button>
 
         {/* Error Message */}
@@ -137,15 +137,21 @@ export default function FutureSpendPage() {
                 className="grid grid-cols-1 sm:grid-cols-3 gap-5 text-center"
               >
                 <div className="p-4 rounded-lg bg-gradient-to-br from-purple-500/20 to-indigo-500/10 border border-purple-500/30 shadow-md">
-                  <p className="text-2xl font-extrabold text-purple-300">₹{result.budget}</p>
+                  <p className="text-2xl font-extrabold text-purple-300">
+                    ₹{result.budget.toLocaleString("en-IN")}
+                  </p>
                   <p className="text-gray-400 text-sm mt-1">Budget</p>
                 </div>
                 <div className="p-4 rounded-lg bg-gradient-to-br from-pink-500/20 to-red-500/10 border border-pink-500/30 shadow-md">
-                  <p className="text-2xl font-extrabold text-pink-300">₹{result.spent}</p>
+                  <p className="text-2xl font-extrabold text-pink-300">
+                    ₹{result.spent.toLocaleString("en-IN")}
+                  </p>
                   <p className="text-gray-400 text-sm mt-1">Spent</p>
                 </div>
                 <div className="p-4 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/10 border border-green-500/30 shadow-md">
-                  <p className="text-2xl font-extrabold text-green-300">₹{result.remaining}</p>
+                  <p className="text-2xl font-extrabold text-green-300">
+                    ₹{result.remaining.toLocaleString("en-IN")}
+                  </p>
                   <p className="text-gray-400 text-sm mt-1">Remaining</p>
                 </div>
               </motion.div>
@@ -172,6 +178,10 @@ export default function FutureSpendPage() {
                             borderRadius: "10px",
                           }}
                           labelStyle={{ color: "#fff" }}
+                          formatter={(value) => [
+                            `₹${Number(value).toLocaleString("en-IN")}`,
+                            "Projected Spend",
+                          ]}
                         />
                         <Bar dataKey="value" fill="#a78bfa" radius={[6, 6, 0, 0]} />
                       </BarChart>

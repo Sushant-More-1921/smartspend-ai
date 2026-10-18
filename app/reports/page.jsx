@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { saveAs } from "file-saver";
 import { motion } from "framer-motion";
 import {
   ResponsiveContainer,
@@ -22,51 +20,73 @@ export default function ReportsPage() {
   const [filter, setFilter] = useState("month"); // day, week, month, year
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [report, setReport] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [exportingFormat, setExportingFormat] = useState(null); // 'pdf' | 'excel' | null
   const [error, setError] = useState(null);
 
-  async function fetchReport() {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await axios.get(`/api/reports?filter=${filter}&date=${date}`);
-      setReport(res.data);
-    } catch (err) {
-      console.error("Error fetching report:", err);
-      setError(err?.response?.data?.error || err.message || "Fetch failed");
-      setReport(null);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   useEffect(() => {
-    fetchReport();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let isCancelled = false;
+
+    fetch(`/api/reports?filter=${filter}&date=${date}`)
+      .then(async (res) => {
+        if (!res.ok) {
+          const errJson = await res.json().catch(() => ({}));
+          throw new Error(errJson.error || `HTTP error ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (!isCancelled) {
+          setReport(data);
+          setError(null);
+        }
+      })
+      .catch((err) => {
+        if (!isCancelled) {
+          console.error("Error fetching report:", err);
+          setError(err.message || "Fetch failed");
+          setReport(null);
+        }
+      })
+      .finally(() => {
+        if (!isCancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
   }, [filter, date]);
 
   async function exportReport(format) {
     try {
       setExportingFormat(format);
-      const res = await axios.post(
+      const res = await fetch(
         `/api/reports?format=${format}&filter=${filter}&date=${date}`,
-        {},
-        { responseType: "blob" }
+        { method: "POST" }
       );
 
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || `Export failed with status ${res.status}`);
+      }
+
+      const blob = await res.blob();
       const ext = format === "pdf" ? "pdf" : "xlsx";
       const filename = `SmartReport-${filter}-${date}.${ext}`;
-      const blob = new Blob([res.data], {
-        type:
-          format === "pdf"
-            ? "application/pdf"
-            : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      saveAs(blob, filename);
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Export error:", err);
-      alert("Export failed. Please try again.");
+      alert(err.message || "Export failed. Please try again.");
     } finally {
       setExportingFormat(null);
     }
@@ -96,7 +116,10 @@ export default function ReportsPage() {
           <div className="flex gap-3 items-center">
             <select
               value={filter}
-              onChange={(e) => setFilter(e.target.value)}
+              onChange={(e) => {
+                setFilter(e.target.value);
+                setLoading(true);
+              }}
               className="bg-[#1e1027] border border-[#2d2036] px-3 py-2 rounded-lg text-sm"
             >
               <option value="day">Day</option>
@@ -108,7 +131,10 @@ export default function ReportsPage() {
             <input
               type="date"
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={(e) => {
+                setDate(e.target.value);
+                setLoading(true);
+              }}
               className="bg-[#1e1027] border border-[#2d2036] px-3 py-2 rounded-lg text-sm text-white focus:outline-none focus:border-purple-500 [color-scheme:dark]"
             />
           </div>

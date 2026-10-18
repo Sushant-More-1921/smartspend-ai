@@ -1,7 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Pencil, Check, X } from "lucide-react";
-import useFetch from "@/hooks/use-fetch";
 import { toast } from "sonner";
 import {
   Card,
@@ -15,19 +14,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { updateBudget } from "@/actions/budget";
 import Link from "next/link";
+import Image from "next/image";
 
 export function BudgetProgress({ initialBudget, currentExpenses }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [newBudget, setNewBudget] = useState(
     initialBudget?.amount?.toString() || ""
   );
-
-  const {
-    loading: isLoading,
-    fn: updateBudgetFn,
-    data: updatedBudget,
-    error,
-  } = useFetch(updateBudget);
 
   const percentUsed = initialBudget
     ? (currentExpenses / initialBudget.amount) * 100
@@ -41,26 +35,26 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
       return;
     }
 
-    await updateBudgetFn(amount);
+    setIsLoading(true);
+    try {
+      const res = await updateBudget(amount);
+      if (res?.success) {
+        setIsEditing(false);
+        toast.success("Budget updated successfully");
+      } else {
+        toast.error(res?.error || "Failed to update budget");
+      }
+    } catch (err) {
+      toast.error(err.message || "Failed to update budget");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancel = () => {
     setNewBudget(initialBudget?.amount?.toString() || "");
     setIsEditing(false);
   };
-
-  useEffect(() => {
-    if (updatedBudget?.success) {
-      setIsEditing(false);
-      toast.success("Budget updated successfully");
-    }
-  }, [updatedBudget]);
-
-  useEffect(() => {
-    if (error) {
-      toast.error(error.message || "Failed to update budget");
-    }
-  }, [error]);
 
   return (
     <Card className="group relative rounded-2xl bg-gradient-to-b from-[#0a0a0a] to-[#111] border border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300">
@@ -126,13 +120,13 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
           </div>
         </div>
 
-        <Link href="/smart-budget">
+        <Link href="/smart-budget" prefetch={true}>
           <Button
             className="ml-3 inline-flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-white shadow-md transition-all bg-gradient-to-br from-orange-500 via-pink-500 to-purple-600 hover:opacity-90 hover:scale-[1.02]"
             type="button"
           >
             Smart Budget Recommendation
-            <img src="/ai-technology.png" alt="AI" className="h-5 w-5" />
+            <Image src="/ai-technology.png" alt="AI" width={20} height={20} className="h-5 w-5" />
           </Button>
         </Link>
       </CardHeader>

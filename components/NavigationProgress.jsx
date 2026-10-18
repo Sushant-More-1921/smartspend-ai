@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 function ProgressIndicator() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
+  const [prevPath, setPrevPath] = useState(pathname);
 
-  useEffect(() => {
-    setLoading(false);
-  }, [pathname, searchParams]);
+  if (pathname !== prevPath) {
+    setPrevPath(pathname);
+    if (loading) {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
     const handleAnchorClick = (e) => {

@@ -17,39 +17,56 @@ export async function getCurrentBudget(accountId) {
       throw new Error("User not found");
     }
 
-    const budget = await db.budget.findFirst({
-      where: {
-        userId: user.id,
-      },
-    });
-
-    // Get current month's expenses
+    // Get current month's expenses (accounting for whole days & current month additions)
     const currentDate = new Date();
     const startOfMonth = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),
-      1
+      1,
+      0, 0, 0, 0
     );
     const endOfMonth = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth() + 1,
-      0
+      0,
+      23, 59, 59, 999
     );
 
-    const expenses = await db.transaction.aggregate({
-      where: {
-        userId: user.id,
-        type: "EXPENSE",
-        date: {
-          gte: startOfMonth,
-          lte: endOfMonth,
+    const whereClause = {
+      userId: user.id,
+      type: "EXPENSE",
+      OR: [
+        {
+          date: {
+            gte: startOfMonth,
+            lte: endOfMonth,
+          },
         },
-        accountId,
-      },
-      _sum: {
-        amount: true,
-      },
-    });
+        {
+          createdAt: {
+            gte: startOfMonth,
+            lte: endOfMonth,
+          },
+        },
+      ],
+    };
+
+    if (accountId && accountId !== "ALL") {
+      whereClause.accountId = accountId;
+    }
+
+    // Fetch budget record and expense aggregation in parallel
+    const [budget, expenses] = await Promise.all([
+      db.budget.findFirst({
+        where: { userId: user.id },
+      }),
+      db.transaction.aggregate({
+        where: whereClause,
+        _sum: {
+          amount: true,
+        },
+      }),
+    ]);
 
     return {
       budget: budget ? { ...budget, amount: budget.amount.toNumber() } : null,

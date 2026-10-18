@@ -1,29 +1,31 @@
 // app/smart-budget/page.jsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Poppins } from "next/font/google";
-
-const playfair = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "700", "900"],
-});
-
+import { useUser } from "@clerk/nextjs";
 
 export default function SmartBudgetPage() {
-  const [email, setEmail] = useState("");
+  const { user } = useUser();
+  const userEmail = user?.primaryEmailAddress?.emailAddress || "";
+  const [email, setEmail] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("user_email") || "";
+    }
+    return "";
+  });
+
+  const [prevUserEmail, setPrevUserEmail] = useState(userEmail);
+  if (userEmail && userEmail !== prevUserEmail) {
+    setPrevUserEmail(userEmail);
+    setEmail(userEmail);
+  }
+
   const [budget, setBudget] = useState("");
-  const [recommendation, setRecommendation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [recommendation, setRecommendation] = useState(null);
 
-  
-  useEffect(() => {
-    const saved =
-      typeof window !== "undefined" ? localStorage.getItem("user_email") : null;
-    if (saved) setEmail(saved);
-  }, []);
 
   const generateRecommendation = async () => {
     setError("");
@@ -49,7 +51,7 @@ export default function SmartBudgetPage() {
       const res = await fetch("/api/smart-budget", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, total_budget: Number(budget) }),
+        body: JSON.stringify({ email: email.trim(), total_budget: Number(budget) }),
       });
 
       const data = await res.json();
@@ -57,6 +59,9 @@ export default function SmartBudgetPage() {
         setError(data.error || "Failed to get recommendation");
       } else {
         setRecommendation(data);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("user_email", email.trim());
+        }
       }
     } catch (err) {
       console.error(err);
@@ -74,11 +79,9 @@ export default function SmartBudgetPage() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="max-w-3xl mx-auto"
       >
-        <h1
-            className={`${playfair.className} mt-4 text-2xl sm:text-6xl lg:text-5xl text-center font-medium tracking-widest bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent`}
-          >
-            Smart budget Recommendation
-          </h1>
+        <h1 className="mt-4 text-3xl sm:text-5xl font-extrabold text-center tracking-tight bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+          Smart Budget Recommendation
+        </h1>
 
         <motion.div
           initial={{ opacity: 0, scale: 1}}
