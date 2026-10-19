@@ -4,6 +4,7 @@ import Header from "@/components/header";
 import NavigationProgress from "@/components/NavigationProgress";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
+
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata = {

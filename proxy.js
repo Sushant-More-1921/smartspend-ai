@@ -26,6 +26,7 @@ const clerk = clerkMiddleware(async (auth, req) => {
 });
 
 export default clerk;
+export const proxy = clerk;
 
 export const config = {
   matcher: [
@@ -33,4 +34,3 @@ export const config = {
     "/(api|trpc)(.*)",
   ],
 };
-

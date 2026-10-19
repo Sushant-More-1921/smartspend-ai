@@ -12,7 +12,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import { ArrowLeft, FileSpreadsheet, FileText, Loader2, TrendingUp, TrendingDown, PiggyBank, Scale } from "lucide-react";
+import { ArrowLeft, FileSpreadsheet, FileText, Loader2, TrendingUp, TrendingDown, PiggyBank, Scale, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -21,17 +21,20 @@ const currencyINR = (v) =>
 
 export default function ReportsPage() {
   const router = useRouter();
-  const [filter, setFilter] = useState("month"); // day, week, month, year
+  const [filter, setFilter] = useState("month"); // day, week, month, year, all
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [exportingFormat, setExportingFormat] = useState(null); // 'pdf' | 'excel' | null
   const [error, setError] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     let isCancelled = false;
 
-    fetch(`/api/reports?filter=${filter}&date=${date}`)
+    fetch(`/api/reports?filter=${filter}&date=${date}&_t=${Date.now()}`, {
+      cache: "no-store",
+    })
       .then(async (res) => {
         if (!res.ok) {
           const errJson = await res.json().catch(() => ({}));
@@ -65,7 +68,7 @@ export default function ReportsPage() {
     return () => {
       isCancelled = true;
     };
-  }, [filter, date, router]);
+  }, [filter, date, refreshKey, router]);
 
   async function exportReport(format) {
     try {
@@ -147,17 +150,34 @@ export default function ReportsPage() {
               <option value="week">Week</option>
               <option value="month">Month</option>
               <option value="year">Year</option>
+              <option value="all">All Time</option>
             </select>
 
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => {
-                setDate(e.target.value);
+            {filter !== "all" && (
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => {
+                  setDate(e.target.value);
+                  setLoading(true);
+                }}
+                className="h-9 px-3 rounded-xl bg-white border border-slate-200 text-slate-900 text-xs font-medium focus:outline-none focus:border-blue-500 shadow-2xs"
+              />
+            )}
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
                 setLoading(true);
+                setRefreshKey((k) => k + 1);
               }}
-              className="h-9 px-3 rounded-xl bg-white border border-slate-200 text-slate-900 text-xs font-medium focus:outline-none focus:border-blue-500 shadow-2xs"
-            />
+              className="h-9 px-3 rounded-xl border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100 flex items-center gap-1.5 text-xs font-medium"
+              title="Refresh report data"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-blue-600" : ""}`} />
+              <span>Refresh</span>
+            </Button>
           </div>
         </div>
 
@@ -171,8 +191,19 @@ export default function ReportsPage() {
             <strong className="font-semibold">Error:</strong> {error}
           </div>
         ) : !report ? (
-          <div className="py-24 flex items-center justify-center text-slate-400 bg-white rounded-2xl border border-slate-200">
-            No transaction records found for this period.
+          <div className="py-24 flex flex-col items-center justify-center space-y-2 text-slate-400 bg-white rounded-2xl border border-slate-200">
+            <p>No transaction records found for this period.</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setFilter("all");
+                setLoading(true);
+              }}
+              className="text-xs text-blue-600 border-blue-200 hover:bg-blue-50"
+            >
+              View All-Time Report
+            </Button>
           </div>
         ) : (
           <>
@@ -279,6 +310,78 @@ export default function ReportsPage() {
                 </ResponsiveContainer>
               </div>
             </div>
+
+            {/* Detailed Statement Transactions Table */}
+            {report.transactions && report.transactions.length > 0 && (
+              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <div>
+                    <h2 className="text-lg font-bold text-slate-900">
+                      Statement Transactions ({report.transactions.length})
+                    </h2>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Itemized breakdown of all transactions reflected in this report
+                    </p>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs text-slate-600">
+                    <thead className="bg-slate-50 text-slate-700 font-semibold uppercase tracking-wider text-[10px]">
+                      <tr>
+                        <th className="px-4 py-3 rounded-l-lg">Date</th>
+                        <th className="px-4 py-3">Description</th>
+                        <th className="px-4 py-3">Category</th>
+                        <th className="px-4 py-3">Type</th>
+                        <th className="px-4 py-3 text-right rounded-r-lg">Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 font-medium">
+                      {report.transactions.map((tx) => {
+                        const isIncome = String(tx.type).toLowerCase() === "income";
+                        const formattedDate = new Date(tx.date || tx.createdAt).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        });
+
+                        return (
+                          <tr key={tx.id} className="hover:bg-slate-50/70 transition-colors">
+                            <td className="px-4 py-3 whitespace-nowrap text-slate-500">{formattedDate}</td>
+                            <td className="px-4 py-3 font-semibold text-slate-800 max-w-[260px] truncate">
+                              {tx.description || "Untitled Transaction"}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <span className="inline-block px-2 py-0.5 text-[11px] font-medium rounded-md bg-slate-100 text-slate-700 capitalize">
+                                {tx.category || "General"}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <span
+                                className={`inline-block px-2 py-0.5 text-[10px] font-semibold rounded-md ${
+                                  isIncome
+                                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                    : "bg-rose-50 text-rose-700 border border-rose-200"
+                                }`}
+                              >
+                                {tx.type}
+                              </span>
+                            </td>
+                            <td
+                              className={`px-4 py-3 whitespace-nowrap text-right font-bold tabular-nums ${
+                                isIncome ? "text-emerald-600" : "text-slate-900"
+                              }`}
+                            >
+                              {isIncome ? "+" : "-"}{currencyINR(tx.amount)}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
             {/* Export Actions Strip */}
             <div className="flex flex-wrap gap-3 justify-end pt-2">

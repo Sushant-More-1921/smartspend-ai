@@ -2,6 +2,7 @@
 
 import aj from "@/lib/arcjet";
 import { db } from "@/lib/prisma";
+import { checkUser } from "@/lib/checkUser";
 import { request } from "@arcjet/next";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
@@ -21,10 +22,14 @@ export async function getUserAccounts() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
+  let user = await db.user.findUnique({
     where: { clerkUserId: userId },
     select: { id: true },
   });
+
+  if (!user) {
+    user = await checkUser();
+  }
 
   if (!user) {
     throw new Error("User not found");
@@ -83,10 +88,14 @@ export async function createAccount(data) {
       throw new Error("Request blocked");
     }
 
-    const user = await db.user.findUnique({
+    let user = await db.user.findUnique({
       where: { clerkUserId: userId },
       select: { id: true },
     });
+
+    if (!user) {
+      user = await checkUser();
+    }
 
     if (!user) {
       throw new Error("User not found");
@@ -158,34 +167,42 @@ export async function getDashboardOverviewData() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-    select: {
-      id: true,
-      accounts: {
-        orderBy: { createdAt: "desc" },
-        include: {
-          _count: {
-            select: { transactions: true },
+  const fetchOverviewUser = () =>
+    db.user.findUnique({
+      where: { clerkUserId: userId },
+      select: {
+        id: true,
+        accounts: {
+          orderBy: { createdAt: "desc" },
+          include: {
+            _count: {
+              select: { transactions: true },
+            },
+          },
+        },
+        transactions: {
+          orderBy: [{ date: "desc" }, { createdAt: "desc" }],
+          take: 50,
+          select: {
+            id: true,
+            type: true,
+            amount: true,
+            description: true,
+            date: true,
+            category: true,
+            accountId: true,
+            createdAt: true,
           },
         },
       },
-      transactions: {
-        orderBy: [{ date: "desc" }, { createdAt: "desc" }],
-        take: 50,
-        select: {
-          id: true,
-          type: true,
-          amount: true,
-          description: true,
-          date: true,
-          category: true,
-          accountId: true,
-          createdAt: true,
-        },
-      },
-    },
-  });
+    });
+
+  let user = await fetchOverviewUser();
+
+  if (!user) {
+    await checkUser();
+    user = await fetchOverviewUser();
+  }
 
   if (!user) throw new Error("User not found");
 

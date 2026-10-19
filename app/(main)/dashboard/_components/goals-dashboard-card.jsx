@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { getFinancialGoals } from "@/actions/goals";
 import { getGoalIconComponent } from "@/lib/goal-icons";
 
-export async function GoalsDashboardCard() {
-  const result = await getFinancialGoals();
+export async function GoalsDashboardCard({ initialData }) {
+  const result = initialData !== undefined ? initialData : await getFinancialGoals();
 
   if (!result || !result.success) {
     return null;

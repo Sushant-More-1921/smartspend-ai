@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/prisma";
+import { checkUser } from "@/lib/checkUser";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 
@@ -21,7 +22,7 @@ export async function getAccountWithTransactions(accountId) {
 
   if (!accountId) return null;
 
-  const account = await db.account.findFirst({
+  let account = await db.account.findFirst({
     where: {
       id: accountId,
       user: { clerkUserId: userId },
@@ -49,6 +50,37 @@ export async function getAccountWithTransactions(accountId) {
     },
   });
 
+  if (!account) {
+    await checkUser();
+    account = await db.account.findFirst({
+      where: {
+        id: accountId,
+        user: { clerkUserId: userId },
+      },
+      include: {
+        transactions: {
+          orderBy: [{ date: "desc" }, { createdAt: "desc" }],
+          select: {
+            id: true,
+            type: true,
+            amount: true,
+            description: true,
+            date: true,
+            category: true,
+            receiptUrl: true,
+            isRecurring: true,
+            recurringInterval: true,
+            nextRecurringDate: true,
+            createdAt: true,
+          },
+        },
+        _count: {
+          select: { transactions: true },
+        },
+      },
+    });
+  }
+
   if (!account) return null;
 
   return {
@@ -62,10 +94,14 @@ export async function bulkDeleteTransactions(transactionIds) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
-    const user = await db.user.findUnique({
+    let user = await db.user.findUnique({
       where: { clerkUserId: userId },
       select: { id: true },
     });
+
+    if (!user) {
+      user = await checkUser();
+    }
 
     if (!user) throw new Error("User not found");
 
@@ -77,7 +113,6 @@ export async function bulkDeleteTransactions(transactionIds) {
       },
     });
 
-    // Group transactions by account to update balances
     // Group transactions by account to update balances
     const accountBalanceChanges = transactions.reduce((acc, transaction) => {
       const amountNum =
@@ -146,10 +181,14 @@ export async function updateDefaultAccount(accountId) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
-    const user = await db.user.findUnique({
+    let user = await db.user.findUnique({
       where: { clerkUserId: userId },
       select: { id: true },
     });
+
+    if (!user) {
+      user = await checkUser();
+    }
 
     if (!user) {
       throw new Error("User not found");
@@ -187,7 +226,7 @@ export async function deleteAccount(accountId) {
 
     if (!accountId) throw new Error("Account ID is required");
 
-    const user = await db.user.findUnique({
+    let user = await db.user.findUnique({
       where: { clerkUserId: userId },
       select: {
         id: true,
@@ -196,6 +235,19 @@ export async function deleteAccount(accountId) {
         },
       },
     });
+
+    if (!user) {
+      await checkUser();
+      user = await db.user.findUnique({
+        where: { clerkUserId: userId },
+        select: {
+          id: true,
+          accounts: {
+            select: { id: true, isDefault: true, name: true },
+          },
+        },
+      });
+    }
 
     if (!user) {
       throw new Error("User not found");
@@ -245,4 +297,3 @@ export async function deleteAccount(accountId) {
     throw new Error(error.message);
   }
 }
-

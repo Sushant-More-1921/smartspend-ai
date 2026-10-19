@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/prisma";
+import { checkUser } from "@/lib/checkUser";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { cache } from "react";
@@ -46,7 +47,7 @@ const getAuthUser = cache(async () => {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
+  let user = await db.user.findUnique({
     where: { clerkUserId: userId },
     include: {
       accounts: {
@@ -54,6 +55,18 @@ const getAuthUser = cache(async () => {
       },
     },
   });
+
+  if (!user) {
+    await checkUser();
+    user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+      include: {
+        accounts: {
+          orderBy: { isDefault: "desc" },
+        },
+      },
+    });
+  }
 
   if (!user) throw new Error("User account not found");
   return user;

@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
+import { checkUser } from "@/lib/checkUser";
 
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
@@ -22,51 +23,75 @@ function sanitizePdfText(str) {
     .trim();
 }
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function getReportData(filter, dateStr) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-
   const date = dayjs(dateStr);
   let start, end;
-  switch (filter) {
-    case "day":
-      start = date.startOf("day").toDate();
-      end = date.endOf("day").toDate();
-      break;
-    case "week":
-      start = date.startOf("week").toDate();
-      end = date.endOf("week").toDate();
-      break;
-    case "year":
-      start = date.startOf("year").toDate();
-      end = date.endOf("year").toDate();
-      break;
-    default:
-      start = date.startOf("month").toDate();
-      end = date.endOf("month").toDate();
+  let dateFilter = {};
+
+  if (filter === "all") {
+    dateFilter = {};
+  } else {
+    switch (filter) {
+      case "day":
+        start = date.startOf("day").toDate();
+        end = date.endOf("day").toDate();
+        break;
+      case "week":
+        start = date.startOf("week").toDate();
+        end = date.endOf("week").toDate();
+        break;
+      case "year":
+        start = date.startOf("year").toDate();
+        end = date.endOf("year").toDate();
+        break;
+      case "month":
+      default:
+        start = date.startOf("month").toDate();
+        end = date.endOf("month").toDate();
+        break;
+    }
+
+    dateFilter = {
+      OR: [
+        { date: { gte: start, lte: end } },
+        { createdAt: { gte: start, lte: end } },
+      ],
+    };
   }
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-    select: {
-      id: true,
-      transactions: {
-        where: {
-          date: { gte: start, lte: end },
-        },
-        orderBy: { date: "asc" },
-        select: {
-          id: true,
-          type: true,
-          amount: true,
-          date: true,
-          category: true,
-          description: true,
+  const fetchReportsUser = () =>
+    db.user.findUnique({
+      where: { clerkUserId: userId },
+      select: {
+        id: true,
+        transactions: {
+          where: dateFilter,
+          orderBy: { date: "asc" },
+          select: {
+            id: true,
+            type: true,
+            amount: true,
+            date: true,
+            createdAt: true,
+            category: true,
+            description: true,
+          },
         },
       },
-    },
-  });
+    });
+
+  let user = await fetchReportsUser();
+
+  if (!user) {
+    await checkUser();
+    user = await fetchReportsUser();
+  }
 
   if (!user) throw new Error("User not found in database");
 
@@ -89,6 +114,9 @@ async function getReportData(filter, dateStr) {
 
   // Sorted transactions
   const sorted = [...normalized].sort((a, b) => b.amountNum - a.amountNum);
+  const sortedByDate = [...normalized].sort(
+    (a, b) => new Date(b.date || b.createdAt).getTime() - new Date(a.date || a.createdAt).getTime()
+  );
 
   // Top & bottom 5
   const highestTransactions = sorted.slice(0, 5).map((t) => ({
@@ -110,6 +138,9 @@ async function getReportData(filter, dateStr) {
     if (filter === "year") {
       key = dayjs(t.date).format("MM");
       label = dayjs(t.date).format("MMM");
+    } else if (filter === "all") {
+      key = dayjs(t.date).format("YYYY-MM");
+      label = dayjs(t.date).format("MMM YYYY");
     } else {
       key = dayjs(t.date).format("YYYY-MM-DD");
       label = dayjs(t.date).format("DD MMM");
@@ -145,6 +176,15 @@ async function getReportData(filter, dateStr) {
     highestTransactions,
     lowestTransactions,
     insights,
+    transactions: sortedByDate.map((t) => ({
+      id: t.id,
+      type: t.type,
+      amount: t.amountNum,
+      date: t.date,
+      createdAt: t.createdAt,
+      category: t.category,
+      description: t.description,
+    })),
   };
 }
 
@@ -157,13 +197,24 @@ export async function GET(req) {
     const report = await getReportData(filter, date);
     return new Response(JSON.stringify(report), {
       status: 200,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+      },
     });
   } catch (err) {
     console.error("GET /api/reports error:", err);
     return new Response(
       JSON.stringify({ error: err.message || "Error generating report" }),
-      { status: 400 }
+      {
+        status: 400,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+        },
+      }
     );
   }
 }
@@ -250,12 +301,23 @@ async function generatePDF(report, filter, dateStr) {
 /* ---------------------- Excel Generator ---------------------- */
 async function generateExcel(report, filter, dateStr) {
   const sheetData = [
-    ["SmartSpend Report", `${filter} - ${dateStr}`],
+    ["SmartSpend Report", `${filter.toUpperCase()} - ${dateStr}`],
     [],
+    ["Summary"],
     ["Total Income", report.totalIncome],
     ["Total Expenses", report.totalExpenses],
     ["Savings", report.savings],
     ["Net Change", report.netChange],
+    [],
+    ["Statement Transactions"],
+    ["Date", "Description", "Category", "Type", "Amount"],
+    ...(report.transactions || []).map((t) => [
+      dayjs(t.date || t.createdAt).format("YYYY-MM-DD"),
+      t.description || "N/A",
+      t.category || "General",
+      t.type,
+      t.amount,
+    ]),
     [],
     ["Highest Transactions"],
     ["Category", "Amount"],

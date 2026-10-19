@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
+import { checkUser } from "@/lib/checkUser";
 import { generateFutureSpendForecast } from "@/lib/future-spend-engine";
 
 export async function POST(req) {
@@ -10,10 +11,13 @@ export async function POST(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await db.user.findUnique({
+    let user = await db.user.findUnique({
       where: { clerkUserId: userId },
       select: { id: true },
     });
+    if (!user) {
+      user = await checkUser();
+    }
     if (!user) {
       return NextResponse.json(
         { error: "User not found in database" },

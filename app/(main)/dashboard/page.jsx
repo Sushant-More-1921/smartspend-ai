@@ -1,5 +1,6 @@
 import { getDashboardOverviewData } from "@/actions/dashboard";
 import { getCurrentBudget } from "@/actions/budget";
+import { getFinancialGoals } from "@/actions/goals";
 import { AccountCard } from "./_components/account-card";
 import { CreateAccountDrawer } from "@/components/create-account-drawer";
 import { BudgetProgress } from "./_components/budget-progress";
@@ -12,10 +13,13 @@ import { PageHeader } from "@/components/ui/page-header";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const [{ accounts = [], transactions = [] }, budgetData] = await Promise.all([
-    getDashboardOverviewData(),
-    getCurrentBudget(),
-  ]);
+  // Parallelize all dashboard queries concurrently to minimize latency
+  const [{ accounts = [], transactions = [] }, budgetData, goalsResult] =
+    await Promise.all([
+      getDashboardOverviewData(),
+      getCurrentBudget(),
+      getFinancialGoals(),
+    ]);
 
   return (
     <div className="space-y-8">
@@ -27,7 +31,7 @@ export default async function DashboardPage() {
       />
 
       {/* Financial Goals & Planner Card */}
-      <GoalsDashboardCard />
+      <GoalsDashboardCard initialData={goalsResult} />
 
       {/* Budget Progress */}
       <BudgetProgress
