@@ -12,9 +12,10 @@ An intelligent personal finance and young investor platform engineered for spend
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-336791?style=flat-square&logo=postgresql)](https://supabase.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
 [![Clerk](https://img.shields.io/badge/Auth-Clerk-6C47FF?style=flat-square&logo=clerk)](https://clerk.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-[Live Demo](https://smartspend-ai-six.vercel.app/) • [Key Features](#key-features) • [Tech Stack](#tech-stack) • [Architecture](#architecture-overview) • [Getting Started](#getting-started) • [Environment Variables](#environment-variables)
+[Live Demo](https://smartspend-ai-six.vercel.app/) • [Key Features](#key-features) • [Tech Stack](#tech-stack) • [Architecture](#architecture-overview) • [Getting Started](#getting-started) • [Docker Setup](#docker-setup) • [Environment Variables](#environment-variables)
 
 </div>
 
@@ -95,7 +96,7 @@ With SmartSpend AI, users can:
 | **Document Processing** | [PDF-Lib](https://pdf-lib.js.org/) (PDF generation), [SheetJS (xlsx)](https://sheetjs.com/) (Excel exports), [json2csv](https://www.npmjs.com/package/json2csv) |
 | **Background Jobs & Email** | [Inngest](https://www.inngest.com/) (Task queues & crons), [Resend](https://resend.com/) & [React Email](https://react.email/) |
 | **Authentication** | [Clerk Auth](https://clerk.com/) |
-| **Deployment** | [Vercel](https://vercel.com/) (Web application), Supabase (Managed Postgres) |
+| **Deployment & Containers** | [Docker](https://www.docker.com/), [Docker Compose](https://docs.docker.com/compose/), [Vercel](https://vercel.com/), Supabase (Postgres) |
 
 ---
 
@@ -293,6 +294,92 @@ ML_SERVICE_URL="http://localhost:8000"
 ```
 
 > **Security Note:** Never commit your actual `.env` file or sensitive API keys to version control.
+
+---
+
+## Docker Setup
+
+SmartSpend AI is containerized using multi-stage Docker builds with standalone Next.js output and includes Docker Compose support for orchestrating both the web application and the Python ML microservice.
+
+### Prerequisites
+
+1. Ensure **Docker Desktop** (or Docker Engine + Docker Compose) is installed and running.
+2. Ensure your `.env` file exists in the root directory with valid credentials (see [Environment Variables](#environment-variables)).
+
+---
+
+### Option 1: Docker Compose (Recommended)
+
+Docker Compose automatically builds and connects both the **Next.js Web App** and the **FastAPI ML Microservice**, wiring networking and environment variables together.
+
+#### 1. Build and Start All Containers
+```bash
+docker compose up -d --build
+```
+
+#### 2. Check Running Containers
+```bash
+docker compose ps
+```
+
+#### 3. View Logs
+```bash
+# Stream combined logs
+docker compose logs -f
+
+# Or stream web application logs only
+docker compose logs -f web
+```
+
+#### 4. Access the Applications
+- **Web Application:** [http://localhost:3000](http://localhost:3000)
+- **FastAPI ML Service:** [http://localhost:8000](http://localhost:8000)
+- **FastAPI Swagger Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
+
+#### 5. Stop the Containers
+```bash
+docker compose down
+```
+
+---
+
+### Option 2: Docker CLI (Standalone Web App)
+
+If you prefer to run the Next.js web application container independently:
+
+#### 1. Build the Docker Image
+```bash
+docker build -t smartspendai:latest .
+```
+
+#### 2. Run the Container
+> [!IMPORTANT]
+> You **must** supply `--env-file .env` when starting the container so Next.js and Clerk have access to runtime environment variables (`CLERK_SECRET_KEY`, `DATABASE_URL`, etc.). Omitting `--env-file .env` will result in an `Internal Server Error` in the browser.
+
+```bash
+docker run -d --name smartspendai -p 3000:3000 --env-file .env smartspendai:latest
+```
+
+#### 3. Monitor Container Logs
+```bash
+docker logs -f smartspendai
+```
+
+#### 4. Stop and Remove the Container
+```bash
+# Stop and remove the container
+docker rm -f smartspendai
+```
+
+---
+
+### Troubleshooting Common Docker Issues
+
+| Issue | Cause | Solution |
+| :--- | :--- | :--- |
+| `500 Internal Server Error` / Missing `secretKey` | Missing runtime environment variables | Always include `--env-file .env` when running `docker run`, or use `docker compose up -d`. |
+| `pull access denied for smartspendai` | Image not built locally before running | Execute `docker build -t smartspendai:latest .` first before running `docker run`. |
+| Port `3000` is already in use | Another local app or container is bound to port 3000 | Stop the conflicting process or map to a different host port (e.g. `-p 3001:3000`). |
 
 ---
 
